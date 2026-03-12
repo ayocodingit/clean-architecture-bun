@@ -64,15 +64,19 @@ class Http {
                 status = statusCode.NOT_FOUND
                 resp.message = statusCode[statusCode.NOT_FOUND]
             } else {
-                resp.message = (error as any)?.message || 'Internal Server Error'
+                resp.message =
+                    (error as any)?.message || 'Internal Server Error'
             }
 
-            this.logger.Error((error as any)?.message || 'Internal Server Error', {
-                additional_info: this.AdditionalInfo(
-                    { request, set } as any,
-                    status
-                ),
-            })
+            this.logger.Error(
+                (error as any)?.message || 'Internal Server Error',
+                {
+                    additional_info: this.AdditionalInfo(
+                        { request, set } as any,
+                        status
+                    ),
+                }
+            )
 
             if (
                 status >= statusCode.INTERNAL_SERVER_ERROR &&
@@ -91,10 +95,7 @@ class Http {
         })
     }
 
-    public AdditionalInfo(
-        ctx: Context,
-        code: number
-    ) {
+    public AdditionalInfo(ctx: Context, code: number) {
         const { request, user } = ctx as any
         const url = new URL(request.url)
         return {
