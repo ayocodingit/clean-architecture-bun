@@ -147,10 +147,18 @@ docker run -p 3000:3000 -d my-app
 
 ## 🧪 Testing
 
-Run unit and integration tests.
+Automated tests are exclusively focused on core utility functions in the `src/helpers` directory.
+
+To run tests:
 
 ```bash
 bun test
+```
+
+or
+
+```bash
+bun run test:unit
 ```
 
 ## 📚 Developer Examples

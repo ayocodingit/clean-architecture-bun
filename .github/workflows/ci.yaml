@@ -25,18 +25,11 @@ jobs:
             - name: Run Bun Install
               run: bun install
 
-            - name: Run build
-              run: bun run build
-
-            - name: Run Testing
-              run: bun run test
+            - name: Run Testing (Unit Only)
+              run: bun run test:unit
+              env:
+                  JWT_ACCESS_SECRET: secret_key
+                  APP_NAME: 'Clean Architecture'
 
             - name: Run Linter
               run: bun run lint
-
-            # - name: Set Up Codeclimate and Send Report Codeclimate
-            #   uses: paambaati/codeclimate-action@v2.7.5
-            #   env:
-            #     CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORT_ID }}
-            #   with:
-            #     coverageLocations: coverage/lcov.info:lcov

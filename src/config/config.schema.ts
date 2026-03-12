@@ -18,11 +18,11 @@ export default Joi.object({
         .valid('mysql', 'postgres')
         .default('postgres')
         .optional(),
-    DB_HOST: Joi.string().optional(),
-    DB_PORT: Joi.number().optional(),
-    DB_USERNAME: Joi.string().optional(),
-    DB_PASSWORD: Joi.string().optional(),
-    DB_NAME: Joi.string().optional(),
+    DB_HOST: Joi.string().optional().default('127.0.0.1'),
+    DB_PORT: Joi.number().optional().default(5432),
+    DB_USERNAME: Joi.string().optional().default('postgres'),
+    DB_PASSWORD: Joi.string().optional().default('postgres'),
+    DB_NAME: Joi.string().optional().default('boilerplate'),
     DB_POOL_MIN: Joi.number().optional().default(0),
     DB_POOL_MAX: Joi.number().optional().default(10),
     DB_POOL_ACQUIRE: Joi.number().optional().default(30000),
