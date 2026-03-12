@@ -18,12 +18,32 @@ const Run = async () => {
     new Storage(logger, config).RunHttp(http)
     // End Load Modules
 
-    http.Run(config.app.port.http)
+    // The http.Run() method is likely intended to set up routes or middleware,
+    // while Bun.serve actually starts the server.
+    // The graceful shutdown logic should apply to the Bun.serve instance.
+    http.Run(config.app.port.http) 
 
-    return Bun.serve({
+    const server = Bun.serve({
         port: config.app.port.http,
         fetch: http.app.fetch,
     })
+
+    // Graceful shutdown
+    const stop = async () => {
+        logger.Info('Shutting down server...')
+        server.stop() // Stop the Bun server
+        logger.Info('Bun server stopped.')
+        await connection.close()
+        logger.Info('Database connection closed.')
+        process.exit(0)
+    }
+
+    process.on('SIGINT', stop)
+    process.on('SIGTERM', stop)
+
+    logger.Info(`Bun server running on port ${config.app.port.http}`)
+
+    return server
 }
 
 export default Run()
