@@ -35,21 +35,28 @@ class Http {
         this.app.use('*', compress())
         this.app.use('*', poweredBy())
         this.app.use('*', prettyJSON())
-        this.app.use('*', honoLogger((str) => this.logger.Info(str)))
+        this.app.use(
+            '*',
+            honoLogger((str) => this.logger.Info(str))
+        )
     }
 
     private pageNotFound = () => {
         this.app.notFound((c) => {
-            return c.json({
-                message: statusCode[statusCode.NOT_FOUND],
-            }, statusCode.NOT_FOUND as any)
+            return c.json(
+                {
+                    message: statusCode[statusCode.NOT_FOUND],
+                },
+                statusCode.NOT_FOUND as any
+            )
         })
     }
 
     private onError = () => {
         this.app.onError((error: any, c) => {
             const resp: responseError = {}
-            const code = Number(error.status) || statusCode.INTERNAL_SERVER_ERROR
+            const code =
+                Number(error.status) || statusCode.INTERNAL_SERVER_ERROR
             resp.message =
                 error.message || statusCode[statusCode.INTERNAL_SERVER_ERROR]
 
@@ -98,7 +105,7 @@ class Http {
     public SetRouter(prefix: string, ...handlers: any[]) {
         const path = (this.config.app.prefix + prefix).replace(/\/+/g, '/')
         // Hono uses app.route for nesting, but here we just mount handlers/routers
-        handlers.forEach(handler => {
+        handlers.forEach((handler) => {
             this.app.route(path, handler)
         })
     }
@@ -124,9 +131,7 @@ class Http {
 
     public Run(port: number) {
         // Note: Running handled via Bun.serve in app.ts
-        this.logger.Info(
-            `Server http is ready at port ${port}`
-        )
+        this.logger.Info(`Server http is ready at port ${port}`)
     }
 }
 

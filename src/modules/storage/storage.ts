@@ -5,10 +5,7 @@ import Handler from './delivery/http/handler'
 import Usecase from './usecase/usecase'
 
 class Storage {
-    constructor(
-        private logger: Logger,
-        private config: Config
-    ) {}
+    constructor(private logger: Logger, private config: Config) {}
 
     public RunHttp(http: Http) {
         const usecase = new Usecase()

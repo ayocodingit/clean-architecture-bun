@@ -22,7 +22,7 @@ class CategoryRepository {
         return this.schema.category.findByPk(id)
     }
 
-    public async Store(body: CategoryDto){
+    public async Store(body: CategoryDto) {
         return this.schema.category.create({
             title: body.title,
             description: body.description,
@@ -30,17 +30,20 @@ class CategoryRepository {
     }
 
     public async Update(id: number, body: CategoryDto) {
-        return this.schema.category.update({
-            title: body.title,
-            description: body.description,
-        }, {
-            where: { id }
-        })
+        return this.schema.category.update(
+            {
+                title: body.title,
+                description: body.description,
+            },
+            {
+                where: { id },
+            }
+        )
     }
 
     public async Delete(id: number) {
         return this.schema.category.destroy({
-            where: { id }
+            where: { id },
         })
     }
 }

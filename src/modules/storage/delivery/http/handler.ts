@@ -12,7 +12,10 @@ class Handler {
 
             const result = await this.usecase.Upload(file)
 
-            return c.json({ data: result, message: 'UPLOADED' }, statusCode.CREATED as any)
+            return c.json(
+                { data: result, message: 'UPLOADED' },
+                statusCode.CREATED as any
+            )
         } catch (error) {
             throw error
         }

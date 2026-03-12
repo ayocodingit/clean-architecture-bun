@@ -40,7 +40,10 @@ class Handler {
                     statusCode.CREATED
                 ),
             })
-            return c.json({ data: result, message: 'CREATED' }, statusCode.CREATED as any)
+            return c.json(
+                { data: result, message: 'CREATED' },
+                statusCode.CREATED as any
+            )
         } catch (error) {
             throw error
         }

@@ -19,7 +19,7 @@ class Usecase {
         return {
             filename: filename,
             size: file.size,
-            type: file.type
+            type: file.type,
         }
     }
 }

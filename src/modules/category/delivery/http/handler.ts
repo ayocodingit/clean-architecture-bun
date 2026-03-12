@@ -4,7 +4,10 @@ import Usecase from '../../usecase/usecase'
 import { Context } from 'hono'
 import statusCode from '../../../../pkg/statusCode'
 import { GetMeta, GetRequest } from '../../../../helpers/requestParams'
-import { ValidateFormRequest, ValidateParams } from '../../../../helpers/validate'
+import {
+    ValidateFormRequest,
+    ValidateParams,
+} from '../../../../helpers/validate'
 import { Store, Update, Id } from '../../entity/schema'
 import { RequestQueryFetch } from '../../entity/interface'
 
@@ -54,7 +57,10 @@ class Handler {
                     statusCode.CREATED
                 ),
             })
-            return c.json({ data: result, message: 'CREATED' }, statusCode.CREATED as any)
+            return c.json(
+                { data: result, message: 'CREATED' },
+                statusCode.CREATED as any
+            )
         } catch (error) {
             throw error
         }
