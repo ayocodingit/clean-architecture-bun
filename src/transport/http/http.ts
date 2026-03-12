@@ -36,11 +36,9 @@ class Http {
                         version: '1.0.0',
                     },
                 },
+                path: '/docs',
             })
         )
-        this.app.onAfterHandle(({ request, set }) => {
-            this.logger.Info(`${request.method} ${request.url} - ${set.status}`)
-        })
     }
 
     private onError = () => {
@@ -68,15 +66,20 @@ class Http {
                     (error as any)?.message || 'Internal Server Error'
             }
 
-            this.logger.Error(
-                (error as any)?.message || 'Internal Server Error',
-                {
-                    additional_info: this.AdditionalInfo(
-                        { request, set } as any,
-                        status
-                    ),
-                }
-            )
+            const url = new URL(request.url)
+            const ignoredPaths = ['/favicon.ico', '/sw.js']
+
+            if (!ignoredPaths.includes(url.pathname)) {
+                this.logger.Error(
+                    (error as any)?.message || 'Internal Server Error',
+                    {
+                        additional_info: this.AdditionalInfo(
+                            { request, set } as any,
+                            status
+                        ),
+                    }
+                )
+            }
 
             if (
                 status >= statusCode.INTERNAL_SERVER_ERROR &&

@@ -21,7 +21,7 @@ const Run = async () => {
     // The http.Run() method is likely intended to set up routes or middleware,
     // while Bun.serve actually starts the server.
     // The graceful shutdown logic should apply to the Bun.serve instance.
-    http.Run(config.app.port.http) 
+    http.Run(config.app.port.http)
 
     const server = Bun.serve({
         port: config.app.port.http,
@@ -40,8 +40,6 @@ const Run = async () => {
 
     process.on('SIGINT', stop)
     process.on('SIGTERM', stop)
-
-    logger.Info(`Bun server running on port ${config.app.port.http}`)
 
     return server
 }

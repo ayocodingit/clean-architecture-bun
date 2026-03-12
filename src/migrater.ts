@@ -43,8 +43,14 @@ const run = async () => {
         } else if (cmd === 'status') {
             const pending = await umzug.pending()
             const executed = await umzug.executed()
-            console.log('Pending migrations:', pending.map((m) => m.name))
-            console.log('Executed migrations:', executed.map((m) => m.name))
+            console.log(
+                'Pending migrations:',
+                pending.map((m) => m.name)
+            )
+            console.log(
+                'Executed migrations:',
+                executed.map((m) => m.name)
+            )
         } else {
             console.error('Unknown command:', cmd)
             process.exit(1)
