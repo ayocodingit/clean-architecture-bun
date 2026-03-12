@@ -1,7 +1,6 @@
 import { Config } from '../../config/config.interface'
 import Logger from '../../pkg/logger'
 import { Sequelize as createConnection, Dialect, Op } from 'sequelize'
-import Post from './models/post'
 import Category from './models/category'
 import { Connection } from './interface'
 
@@ -36,13 +35,11 @@ class Sequalize {
 
     public static Models = (connection: Connection) => {
         // load all model on folder models
-        const post = Post(connection)
         const category = Category(connection)
 
         // setup relation for eager loader in here
         // example: User.hasOne(Profile)
         return {
-            post,
             category,
             // Add other models if needed
             // ...

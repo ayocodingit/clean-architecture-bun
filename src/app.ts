@@ -1,6 +1,5 @@
 import config from './config/config'
 import Sequelize from './database/sequelize/sequelize'
-import Post from './modules/post/post'
 import Logger from './pkg/logger'
 
 import Category from './modules/category/category'
@@ -14,8 +13,6 @@ const Run = async () => {
     const http = new Http(logger, config, connection)
 
     // Start Load Modules
-    new Post(logger, config, connection).RunHttp(http)
-
     new Category(logger, config, connection).RunHttp(http)
 
     new Storage(logger, config).RunHttp(http)
