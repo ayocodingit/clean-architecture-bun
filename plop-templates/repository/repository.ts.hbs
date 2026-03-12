@@ -1,0 +1,48 @@
+import Logger from '../../../pkg/logger'
+import { RequestParams } from '../../../helpers/requestParams'
+import { Schema } from '../../../database/sequelize/interface'
+import { Filter{{pascalCase repository}}Dto, {{pascalCase repository}}Dto } from './dto'
+
+class {{pascalCase repository}}Repository {
+    constructor(private logger: Logger, private schema: Schema) {}
+
+    public async Fetch(request: RequestParams<Filter{{pascalCase repository}}Dto>) {
+        const { count, rows } = await this.schema.{{camelCase repository}}.findAndCountAll({
+            limit: request.per_page,
+            offset: request.offset,
+        })
+
+        return {
+            data: rows,
+            count,
+        }
+    }
+
+    public async GetById(id: number) {
+        return this.schema.{{camelCase repository}}.findByPk(id)
+    }
+
+    public async Store(body: {{pascalCase repository}}Dto){
+        return this.schema.{{camelCase repository}}.create({
+            title: body.title,
+            description: body.description,
+        })
+    }
+
+    public async Update(id: number, body: {{pascalCase repository}}Dto) {
+        return this.schema.{{camelCase repository}}.update({
+            title: body.title,
+            description: body.description,
+        }, {
+            where: { id }
+        })
+    }
+
+    public async Delete(id: number) {
+        return this.schema.{{camelCase repository}}.destroy({
+            where: { id }
+        })
+    }
+}
+
+export default {{pascalCase repository}}Repository

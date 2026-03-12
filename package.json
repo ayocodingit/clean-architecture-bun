@@ -1,0 +1,62 @@
+{
+    "name": "boilerplate-clean-architecture",
+    "version": "1.0.0",
+    "description": "High-performance Boilerplate Clean Architecture powered by Bun and Hono framework.",
+    "main": "main.js",
+    "scripts": {
+        "dev": "bun --watch src/app.ts",
+        "build": "bun build ./src/app.ts --outdir ./build --target bun",
+        "start": "bun build/app.js",
+        "lint": "bunx prettier --check ./src",
+        "lint:fix": "bunx prettier --write ./src",
+        "cron:run": "bun src/cron/$npm_config_name.cron.ts",
+        "seed:run": "bun src/database/seeds/$npm_config_name.seed.ts",
+        "make:migration": "bunx plop migration",
+        "migrate": "bunx sequelize-cli db:migrate --config src/migrater.ts --migrations-path src/database/sequelize/migrations",
+        "migrate:rollback": "bunx sequelize-cli db:migrate:undo --config src/migrater.ts --migrations-path src/database/sequelize/migrations",
+        "test": "APP_ENV=test APP_LOG=error bun test",
+        "make:module": "bunx plop module",
+        "make:cron": "bunx plop cron"
+    },
+    "keywords": [
+        "clean-architecture",
+        "bun",
+        "typescript",
+        "hono",
+        "javascript",
+        "sequelize",
+        "boilerplate",
+        "high-performance"
+    ],
+    "author": "ayocodingit",
+    "license": "MIT",
+    "devDependencies": {
+        "@types/bun": "^1.3.10",
+        "@types/i18n": "^0.13.6",
+        "@types/jsonwebtoken": "^9.0.1",
+        "@types/sequelize": "^4.28.19",
+        "bun-types": "^1.3.10",
+        "plop": "^4.0.4",
+        "prettier": "2.8.2",
+        "tslib": "^2.6.2",
+        "typescript": "^4.9.4"
+    },
+    "dependencies": {
+        "@hono/node-server": "^1.19.11",
+        "bcryptjs": "^3.0.3",
+        "date-fns": "^3.0.6",
+        "dotenv": "^16.0.3",
+        "hono": "^4.12.7",
+        "http-status": "^1.6.2",
+        "i18n": "^0.15.1",
+        "joi": "^17.7.0",
+        "jsonwebtoken": "^9.0.0",
+        "pg": "^8.16.3",
+        "pg-hstore": "^2.3.4",
+        "redis": "^4.5.1",
+        "sequelize": "^6.35.2",
+        "sequelize-cli": "^6.6.2",
+        "umzug": "^3.8.2",
+        "winston": "^3.8.2"
+    }
+}
