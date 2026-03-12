@@ -1,11 +1,11 @@
-import { Context, Next } from 'hono'
+import { Context } from 'elysia'
 import Error from '../../../pkg/error'
 import statusCode from '../../../pkg/statusCode'
 import Jwt from '../../../pkg/jwt'
 
 export const VerifyAuth = (jwt: Jwt) => {
-    return async (c: Context, next: Next) => {
-        const authorization = c.req.header('authorization')
+    return async (ctx: Context) => {
+        const authorization = ctx.request.headers.get('authorization')
 
         if (!authorization) {
             throw new Error(
@@ -16,6 +16,13 @@ export const VerifyAuth = (jwt: Jwt) => {
 
         const [_, token] = authorization.split('Bearer ')
 
+        if (!token) {
+            throw new Error(
+                statusCode.UNAUTHORIZED,
+                statusCode[statusCode.UNAUTHORIZED]
+            )
+        }
+
         const decode = jwt.Verify(token)
         if (!decode) {
             throw new Error(
@@ -23,7 +30,9 @@ export const VerifyAuth = (jwt: Jwt) => {
                 statusCode[statusCode.UNAUTHORIZED]
             )
         }
-        c.set('user', decode)
-        await next()
+
+        return {
+            user: decode,
+        }
     }
 }

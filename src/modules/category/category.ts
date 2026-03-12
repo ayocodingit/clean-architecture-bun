@@ -33,6 +33,7 @@ class Category {
         const Router = http.Router()
 
         Router.get('/', handler.Fetch)
+        Router.get('/export', handler.Export)
         Router.get('/:id', handler.Show)
 
         http.SetRouter('/v1/public/categories', Router)
@@ -44,7 +45,7 @@ class Category {
 
         const auth = VerifyAuth(jwt)
 
-        Router.use('*', auth)
+        Router.onBeforeHandle(auth)
         Router.post('/', handler.Store)
         Router.patch('/:id', handler.Update)
         Router.delete('/:id', handler.Delete)

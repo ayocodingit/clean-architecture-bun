@@ -1,7 +1,7 @@
+import { Context } from 'elysia'
 import Http from '../../../../transport/http/http'
 import Logger from '../../../../pkg/logger'
 import Usecase from '../../usecase/usecase'
-import { Context } from 'hono'
 import statusCode from '../../../../pkg/statusCode'
 import { GetMeta, GetRequest } from '../../../../helpers/requestParams'
 import { ValidateFormRequest, ValidateParams } from '../../../../helpers/validate'
@@ -15,76 +15,77 @@ class Handler {
         private usecase: Usecase
     ) {}
 
-    public Fetch = async (c: Context) => {
+    public Fetch = async (ctx: Context) => {
         try {
-            const request = GetRequest<RequestQueryFetch>(c.req.query() as any)
+            const request = GetRequest<RequestQueryFetch>(ctx.query as any)
             const { data, count } = await this.usecase.Fetch(request)
             this.logger.Info(statusCode[statusCode.OK], {
-                additional_info: this.http.AdditionalInfo(c, statusCode.OK),
+                additional_info: this.http.AdditionalInfo(ctx, statusCode.OK),
             })
 
-            return c.json({ data, meta: GetMeta(request, count) })
+            return { data, meta: GetMeta(request, count) }
         } catch (error) {
             throw error
         }
     }
 
-    public Show = async (c: Context) => {
+    public Show = async (ctx: Context) => {
         try {
-            const { id } = ValidateParams(Id, c.req.param())
+            const { id } = ValidateParams(Id, ctx.params)
             const result = await this.usecase.Show(id)
             this.logger.Info(statusCode[statusCode.OK], {
-                additional_info: this.http.AdditionalInfo(c, statusCode.OK),
+                additional_info: this.http.AdditionalInfo(ctx, statusCode.OK),
             })
 
-            return c.json({ data: result })
+            return { data: result }
         } catch (error) {
             throw error
         }
     }
 
-    public Store = async (c: Context) => {
+    public Store = async (ctx: Context) => {
         try {
-            const body = await c.req.json()
+            const body = ctx.body
             const validate = ValidateFormRequest(Store, body)
             const result = await this.usecase.Store(validate)
             this.logger.Info(statusCode[statusCode.CREATED], {
                 additional_info: this.http.AdditionalInfo(
-                    c,
+                    ctx,
                     statusCode.CREATED
                 ),
             })
-            return c.json({ data: result, message: 'CREATED' }, statusCode.CREATED as any)
+            ctx.set.status = statusCode.CREATED
+            return { data: result, message: 'CREATED' }
         } catch (error) {
             throw error
         }
     }
 
-    public Update = async (c: Context) => {
+    public Update = async (ctx: Context) => {
         try {
-            const { id } = ValidateParams(Id, c.req.param())
-            const body = await c.req.json()
+            const { id } = ValidateParams(Id, ctx.params)
+            const body = ctx.body
             const validate = ValidateFormRequest(Update, body)
             await this.usecase.Update(id, validate)
             this.logger.Info(statusCode[statusCode.OK], {
-                additional_info: this.http.AdditionalInfo(c, statusCode.OK),
+                additional_info: this.http.AdditionalInfo(ctx, statusCode.OK),
             })
 
-            return c.json({ message: 'UPDATED' })
+            return { message: 'UPDATED' }
         } catch (error) {
             throw error
         }
     }
 
-    public Delete = async (c: Context) => {
+    public Delete = async (ctx: Context) => {
         try {
-            const { id } = ValidateParams(Id, c.req.param())
+            const { id } = ValidateParams(Id, ctx.params)
             await this.usecase.Delete(id)
             this.logger.Info(statusCode[statusCode.OK], {
-                additional_info: this.http.AdditionalInfo(c, statusCode.OK),
+                additional_info: this.http.AdditionalInfo(ctx, statusCode.OK),
             })
 
-            return c.json({ message: 'DELETED' })
+            return { message: 'DELETED' }
         } catch (error) {
             throw error
         }

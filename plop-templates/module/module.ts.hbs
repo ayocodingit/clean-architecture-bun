@@ -41,13 +41,12 @@ class {{properCase name}} {
     public httpPrivate(handler: Handler, http: Http) {
         const Router = http.Router()
         const jwt = new Jwt(this.config.jwt.access_key)
-
         const auth = VerifyAuth(jwt)
 
-        Router.use('*', auth)
-        Router.post('/', handler.Store)
-        Router.patch('/:id', handler.Update)
-        Router.delete('/:id', handler.Delete)
+        Router.onBeforeHandle(auth).get('/', handler.Fetch)
+        Router.onBeforeHandle(auth).post('/', handler.Store)
+        Router.onBeforeHandle(auth).patch('/:id', handler.Update)
+        Router.onBeforeHandle(auth).delete('/:id', handler.Delete)
 
         http.SetRouter('/v1/{{camelCase name}}s/', Router)
     }

@@ -1,3 +1,31 @@
-import statusCode from 'http-status'
+const statusCode: Record<number | string, any> = {
+    OK: 200,
+    CREATED: 201,
+    ACCEPTED: 202,
+    NO_CONTENT: 204,
+    BAD_REQUEST: 400,
+    UNAUTHORIZED: 401,
+    FORBIDDEN: 403,
+    NOT_FOUND: 404,
+    METHOD_NOT_ALLOWED: 405,
+    CONFLICT: 409,
+    UNPROCESSABLE_ENTITY: 422,
+    INTERNAL_SERVER_ERROR: 500,
+    SERVICE_UNAVAILABLE: 503,
+    // Add reverse mapping
+    200: 'OK',
+    201: 'CREATED',
+    202: 'ACCEPTED',
+    204: 'NO_CONTENT',
+    400: 'BAD_REQUEST',
+    401: 'UNAUTHORIZED',
+    403: 'FORBIDDEN',
+    404: 'NOT_FOUND',
+    405: 'METHOD_NOT_ALLOWED',
+    409: 'CONFLICT',
+    422: 'UNPROCESSABLE_ENTITY',
+    500: 'INTERNAL_SERVER_ERROR',
+    503: 'SERVICE_UNAVAILABLE',
+}
 
 export default statusCode

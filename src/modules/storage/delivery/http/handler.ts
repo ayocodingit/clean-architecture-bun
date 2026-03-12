@@ -1,21 +1,19 @@
-import { Context } from 'hono'
+import { Context } from 'elysia'
 import statusCode from '../../../../pkg/statusCode'
 import Usecase from '../../usecase/usecase'
 
 class Handler {
     constructor(private usecase: Usecase) {}
 
-    public Upload = async (c: Context) => {
+    public Upload = async (ctx: Context) => {
         try {
-            const body = await c.req.parseBody()
-            const file = body['file'] as File
+            const body = ctx.body as { file: File }
+            const file = body.file
 
             const result = await this.usecase.Upload(file)
 
-            return c.json(
-                { data: result, message: 'UPLOADED' },
-                statusCode.CREATED as any
-            )
+            ctx.set.status = statusCode.CREATED
+            return { data: result, message: 'UPLOADED' }
         } catch (error) {
             throw error
         }

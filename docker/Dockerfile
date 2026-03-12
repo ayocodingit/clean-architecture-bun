@@ -1,22 +1,19 @@
 FROM oven/bun:alpine AS builder
 WORKDIR /app
-RUN apk add --no-cache git
-COPY package.json ./
-RUN bun install
+COPY package.json bun.lock ./
+RUN bun install --frozen-lockfile
 COPY . .
 RUN bun run build
 
 FROM oven/bun:alpine AS server
 WORKDIR /app
-RUN apk add --no-cache git
 
-# Install PM2 if you still want to use it, although Bun can be run directly
-RUN bun add -g pm2
+# Non-root user for security
+RUN adduser -D bunuser
+USER bunuser
 
-COPY package.json ./
-RUN bun install --production
 COPY --from=builder /app/build ./build
-COPY ecosystem.config.js ./
+COPY --from=builder /app/package.json ./
 
 EXPOSE 3000
-CMD ["pm2-runtime", "ecosystem.config.js"]
+CMD ["bun", "run", "start"]

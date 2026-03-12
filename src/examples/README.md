@@ -2,77 +2,93 @@
 
 This directory contains examples of how to use various Bun-native features and core functionalities of this boilerplate.
 
-## 🚀 Features & Usage
+## 🧪 Manual Testing & Feature Guide
 
-### 1. High-Performance File Upload
+Use these `curl` commands to verify the core features of the boilerplate.
 
-We use Bun's native `Bun.write()` and Hono's `parseBody()` for high-performance, zero-copy file storage.
+### 1. Public Category Endpoints (No Auth)
 
-**Endpoint:** `POST /v1/storage`
-**Method:** `multipart/form-data`
-**Payload:** `file` (File)
+**Fetch Categories (with Pagination):**
 
-**Manual Test with Curl:**
+```bash
+curl -s "http://localhost:3000/v1/public/categories?page=1&limit=5" | jq
+```
+
+**Get Specific Category:**
+
+```bash
+curl -s "http://localhost:3000/v1/public/categories/1" | jq
+```
+
+**Export to CSV:**
+
+```bash
+curl -O http://localhost:3000/v1/public/categories/export
+```
+
+---
+
+### 2. Protected Category Endpoints (Requires Auth)
+
+_Note: Replace `<token>` with a valid JWT._
+
+**Create Category:**
+
+```bash
+curl -X POST http://localhost:3000/v1/categories \
+  -H "Authorization: Bearer <token>" \
+  -H "Content-Type: application/json" \
+  -d '{"title": "New Category", "description": "Awesome stuff"}'
+```
+
+**Update Category:**
+
+```bash
+curl -X PATCH http://localhost:3000/v1/categories/1 \
+  -H "Authorization: Bearer <token>" \
+  -H "Content-Type: application/json" \
+  -d '{"title": "Updated Title"}'
+```
+
+---
+
+### 3. High-Performance Storage
+
+**Upload File:**
 
 ```bash
 curl -X POST http://localhost:3000/v1/storage \
-  -F "file=@/path/to/your/image.jpg"
+  -F "file=@/path/to/image.png"
 ```
 
 ---
 
-### 2. External API Handling (Native Fetch)
+### 4. Advanced Code Snippets
 
-Bun has native `fetch` optimized for the runtime. You don't need `axios` or `node-fetch`.
+#### 📩 Sending Emails (Nodemailer Pattern)
 
-**Example Code:**
+We recommend using `nodemailer` in the `pkg/` directory if you need email support.
 
 ```typescript
-const response = await fetch('https://api.example.com/data')
-const data = await response.json()
+import nodemailer from 'nodemailer'
+
+const transporter = nodemailer.createTransport({...})
+await transporter.sendMail({
+    from: 'sender@example.com',
+    to: 'receiver@example.com',
+    subject: 'Hello',
+    html: '<b>Hello world?</b>'
+})
 ```
 
-_Implementation can be found in various usecases as a standard pattern._
+#### 📊 Complex Data Export (CSV Pattern)
 
----
-
-### 3. Redis Integration
-
-The boilerplate includes a pre-configured Redis client for caching.
-
-**Basic Operations:**
+Implemented in `src/modules/category/delivery/http/handler.ts`:
 
 ```typescript
-await redis.Store('key', 'value', 3600) // Store for 1 hour
-const data = await redis.Get('key')
-```
-
----
-
-### 4. Global Error Handling
-
-We provide consistent error responses for 404 (Not Found) and 500 (Internal Server Error).
-
--   **404:** Triggered when a route is not registered.
--   **500:** Automatically catches uncaught exceptions and returns a structured JSON response.
-
----
-
-### 5. Pagination & Validation
-
-Structured metadata for listing endpoints and robust form validation using `Joi`.
-
-**Standard Response Meta:**
-
-```json
-{
-  "data": [...],
-  "meta": {
-    "per_page": 10,
-    "current_page": 1,
-    "total": 50
-  }
-}
+ctx.set.headers['Content-Type'] = 'text/csv'
+ctx.set.headers['Content-Disposition'] = 'attachment; filename="data.csv"'
+return 'column1,column2\nval1,val2'
 ```
 
 ## 🧪 Testing Policy
@@ -83,4 +99,4 @@ Automated tests are focused only on core utility functions in `src/helpers`. To 
 bun run test:unit
 ```
 
-For features requiring external services (Database, Redis), manual verification or integration testing in a staging environment is recommended.
+For features requiring external services (Database, Redis), manual verification via `curl` (as shown above) is the recommended approach for development.

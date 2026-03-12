@@ -1,9 +1,6 @@
-import { Hono } from 'hono'
-import { cors } from 'hono/cors'
-import { compress } from 'hono/compress'
-import { logger as honoLogger } from 'hono/logger'
-import { poweredBy } from 'hono/powered-by'
-import { prettyJSON } from 'hono/pretty-json'
+import { Elysia, Context } from 'elysia'
+import { cors } from '@elysiajs/cors'
+import { swagger } from '@elysiajs/swagger'
 import statusCode from '../../pkg/statusCode'
 import { Config } from '../../config/config.interface'
 import Error from '../../pkg/error'
@@ -16,121 +13,130 @@ type responseError = {
 }
 
 class Http {
-    public app: Hono
+    public app: Elysia
 
     constructor(
         private logger: Logger,
         private config: Config,
         private connection: Connection
     ) {
-        this.app = new Hono()
+        this.app = new Elysia()
         this.plugins()
         this.ping()
-        this.pageNotFound()
         this.onError()
     }
 
     private plugins() {
-        this.app.use('*', cors())
-        this.app.use('*', compress())
-        this.app.use('*', poweredBy())
-        this.app.use('*', prettyJSON())
+        this.app.use(cors())
         this.app.use(
-            '*',
-            honoLogger((str) => this.logger.Info(str))
-        )
-    }
-
-    private pageNotFound = () => {
-        this.app.notFound((c) => {
-            return c.json(
-                {
-                    message: statusCode[statusCode.NOT_FOUND],
+            swagger({
+                documentation: {
+                    info: {
+                        title: this.config.app.name,
+                        version: '1.0.0',
+                    },
                 },
-                statusCode.NOT_FOUND as any
-            )
+            })
+        )
+        this.app.onAfterHandle(({ request, set }) => {
+            this.logger.Info(`${request.method} ${request.url} - ${set.status}`)
         })
     }
 
     private onError = () => {
-        this.app.onError((error: any, c) => {
+        this.app.error({
+            ERROR: Error,
+        })
+
+        this.app.onError(({ code, error, set, request }) => {
             const resp: responseError = {}
-            const code =
-                Number(error.status) || statusCode.INTERNAL_SERVER_ERROR
-            resp.message =
-                error.message || statusCode[statusCode.INTERNAL_SERVER_ERROR]
+            let status: number = statusCode.INTERNAL_SERVER_ERROR
 
-            if (error.isObject) resp.message = JSON.parse(error.message)
+            if (error instanceof Error) {
+                if ('status' in error) {
+                    status = (error as any).status
+                }
+                resp.message =
+                    'isObject' in error && (error as any).isObject
+                        ? JSON.parse(error.message)
+                        : error.message
+            } else if (code === 'NOT_FOUND') {
+                status = statusCode.NOT_FOUND
+                resp.message = statusCode[statusCode.NOT_FOUND]
+            } else {
+                resp.message = (error as any)?.message || 'Internal Server Error'
+            }
 
-            this.logger.Error(error.message, {
-                additional_info: this.AdditionalInfo(c, code),
+            this.logger.Error((error as any)?.message || 'Internal Server Error', {
+                additional_info: this.AdditionalInfo(
+                    { request, set } as any,
+                    status
+                ),
             })
 
             if (
-                code >= statusCode.INTERNAL_SERVER_ERROR &&
+                status >= statusCode.INTERNAL_SERVER_ERROR &&
                 this.config.app.env === 'production'
             ) {
                 resp.message = statusCode[statusCode.INTERNAL_SERVER_ERROR]
             }
 
-            if (code === statusCode.UNPROCESSABLE_ENTITY) {
+            if (status === statusCode.UNPROCESSABLE_ENTITY) {
                 resp.errors = resp.message as object
                 delete resp.message
             }
 
-            return c.json(resp, code as any)
+            set.status = status as any
+            return resp
         })
     }
 
-    public AdditionalInfo(c: any, statusCode: number) {
+    public AdditionalInfo(
+        ctx: Context,
+        code: number
+    ) {
+        const { request, user } = ctx as any
+        const url = new URL(request.url)
         return {
             env: this.config.app.env,
-            http_uri: c.req.path,
-            http_host: this.GetDomain(c),
-            http_method: c.req.method,
-            http_scheme: 'http', // Bun usually runs behind proxy or native http
-            remote_addr: '1.1', // Hono abstracting this
-            user_agent: c.req.header('user-agent'),
-            origin: c.req.header('origin') || 'unknown',
+            http_uri: url.pathname,
+            http_host: url.host,
+            http_method: request.method,
+            http_scheme: url.protocol.replace(':', ''),
+            remote_addr: '1.1',
+            user_agent: request.headers.get('user-agent'),
+            origin: request.headers.get('origin') || 'unknown',
             tz: new Date(),
-            code: statusCode,
-            user: c.get('user') || {},
+            code: code,
+            user: user || {},
         }
     }
 
-    public GetDomain(c: any) {
-        return c.req.header('host')
-    }
-
-    public SetRouter(prefix: string, ...handlers: any[]) {
+    public SetRouter(prefix: string, handler: Elysia<any>) {
         const path = (this.config.app.prefix + prefix).replace(/\/+/g, '/')
-        // Hono uses app.route for nesting, but here we just mount handlers/routers
-        handlers.forEach((handler) => {
-            this.app.route(path, handler)
-        })
+        this.app.use(new Elysia({ prefix: path }).use(handler))
     }
 
     public Router() {
-        return new Hono()
+        return new Elysia()
     }
 
     private ping = () => {
-        this.app.get('/', async (c) => {
+        this.app.get('/', async (ctx) => {
             // test connection to database
             await this.connection.query('SELECT 1+1 AS result')
 
             this.logger.Info('OK', {
-                additional_info: this.AdditionalInfo(c, statusCode.OK),
+                additional_info: this.AdditionalInfo(ctx as any, statusCode.OK),
             })
 
-            return c.json({
+            return {
                 app_name: this.config.app.name,
-            })
+            }
         })
     }
 
     public Run(port: number) {
-        // Note: Running handled via Bun.serve in app.ts
         this.logger.Info(`Server http is ready at port ${port}`)
     }
 }
