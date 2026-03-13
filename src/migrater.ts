@@ -26,7 +26,10 @@ const umzug = new Umzug({
         },
     },
     context: database.getQueryInterface(),
-    storage: new SequelizeStorage({ sequelize: database }),
+    storage: new SequelizeStorage({
+        sequelize: database,
+        tableName: 'migrations',
+    }),
     logger: console,
 })
 
