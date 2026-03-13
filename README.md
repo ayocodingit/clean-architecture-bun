@@ -40,56 +40,67 @@ By separating concerns into distinct layers (Entities, Use Cases, Interface Adap
     -   **Logging**: Winston
     -   **Validation**: Joi
 
-## 📂 Folder Structure & Clean Architecture Layers
+## 📂 Folder Structure & Architecture
 
-This boilerplate strictly follows Clean Architecture. Here's a deep dive into each layer:
+This boilerplate strictly adheres to the **Clean Architecture** pattern. The core principle is the **Dependency Rule**: _Dependencies only point inwards._ Inner layers (Entities & Use Cases) have no knowledge of outer layers (Frameworks & Drivers).
 
-### 1. `src/modules/[module_name]/entity` (Entities)
-
-**The Core Layer**: Contains enterprise business rules.
-
--   **Interfaces**: Definitions of the data structures.
--   **Schemas**: Validation logic (using **Joi**).
--   _Rules_: This layer must not depend on any other layer or external libraries (except validation).
-
-### 2. `src/modules/[module_name]/usecase` (Use Cases)
-
-**The Business Logic Layer**: Contains application-specific business rules.
-
--   Orchestrates the flow of data to and from entities.
--   Interacts with Repository interfaces to fetch/save data.
--   _Rules_: Independent of database and framework.
-
-### 3. `src/database/repository` (Interface Adapters - Repositories)
-
-**The Data Access Layer**: Converts data from the format most convenient for the use cases and entities to the format most convenient for external agencies (Database).
-
--   Implements the repository interfaces defined in the core.
--   Uses **Sequelize** for SQL operations.
-
-### 4. `src/modules/[module_name]/delivery/http` (Interface Adapters - Handlers)
-
-**The Delivery Layer**: Converts data from the format most convenient for the web framework (Elysia context) to the format needed by Use Cases.
-
--   Handles requests, extracts parameters, and returns responses.
--   Implements HTTP-specific logic (Status codes, Headers).
-
-### 5. `src/transport/http` (Frameworks & Drivers)
-
-**The Infrastructure Layer**: Configuration of the Elysia server, middlewares, and routing.
+### 🏗️ Directory Overview
 
 ```text
 src/
-├── config/             # Configuration & ENV management
-├── cron/               # Scheduled background tasks
-├── database/           # Persistence layer (Migrations, Repositories)
-├── helpers/            # Utility functions (Date, Validation, etc.)
-├── modules/            # BUSINESS CORE (Encapsulated by module)
-├── pkg/                # Shared internal packages (Logger, JWT, Error)
-├── transport/          # External entry points (HTTP)
-├── app.ts              # App Bootstrapper
-└── migrater.ts         # DB Migration engine
+├── config/             # App configuration & ENV management
+├── cron/               # Background & Scheduled tasks
+├── database/           # Data Persistence Layer
+│   ├── repository/     # Interface Adapters: Database implementations
+│   └── sequelize/      # Infrastructure: Models & Migrations
+├── helpers/            # Pure utility functions (Dates, Request parsing)
+├── modules/            # BUSINESS CORE (Encapsulated feature modules)
+├── pkg/                # Shared internal library (Logger, JWT, Error)
+├── transport/          # Outer Layer: HTTP Server setup & Routing
+├── app.ts              # Entry point: App Bootstrapper
+└── migrater.ts         # CLI Tool: Database Migration engine
 ```
+
+### 🛡️ Clean Architecture Layers
+
+#### 1. Entities (`src/modules/*/entity`)
+
+**Enterprise Business Rules**: The most stable layer. Contains data structures (Interfaces) and business validation rules (Joi Schemas).
+
+-   **Interface**: Defines the shape of the data used across the module.
+-   **Schema**: Joi validation schemas for incoming data (Store, Update, Params).
+
+#### 2. Use Cases (`src/modules/*/usecase`)
+
+**Application Business Logic**: Orchestrates the flow of data to and from entities.
+
+-   Implements specific business rules.
+-   Interacts with **Repository interfaces** to perform data operations.
+-   Throws meaningful errors that are caught by the delivery layer.
+
+#### 3. Interface Adapters (`src/database/repository` & `src/modules/*/delivery`)
+
+**The Bridges**:
+
+-   **Delivery (HTTP Handler)**: Translates Elysia context (params, body, query) into Use Case inputs. It handles HTTP status codes and response formatting.
+-   **Repositories**: Implements data persistence logic. It interacts with Sequelize models to perform CRUD operations.
+
+#### 4. Frameworks & Drivers (`src/transport/http` & `src/database/sequelize`)
+
+**The Infrastructure**:
+
+-   **Transport**: Configuration of the Elysia server, global middlewares, and route registration.
+-   **Sequelize**: Database connection, connection pooling, and model definitions.
+
+### 🧩 Module Deep-Dive
+
+Each directory in `src/modules/` is a self-contained feature module:
+
+-   `[module].ts`: The **Module Registry**. It performs manual dependency injection by instantiating the Repository, Usecase, and Handler, then registers the routes.
+-   `usecase/usecase.ts`: Centralizes logic for the feature.
+-   `delivery/http/handler.ts`: Handles ElysiaJS requests.
+-   `entity/interface.ts`: Defines TypeScript interfaces.
+-   `entity/schema.ts`: Defines Joi validation schemas.
 
 ## 🛠️ Installation & Setup
 
@@ -165,7 +176,7 @@ Build and run the application using Docker.
 
 ```bash
 # Build image
-docker -f docker/Dockerfile build -t my-app .
+docker build -t my-app -f docker/Dockerfile .
 
 # Run container
 docker run -p 3000:3000 -d my-app
@@ -186,16 +197,6 @@ or
 ```bash
 bun run test:unit
 ```
-
-## 📚 Developer Examples
-
-We have provided a set of organized tests and examples in `src/examples/tests` to help you understand the new Bun-native capabilities:
-
--   **`fetch_example.test.ts`**: Demonstrates how to use Bun's native `fetch` for external API requests (replaces `axios`).
--   **`storage.test.ts`**: Shows high-performance file uploading using Elysia's `body` and `Bun.write()`.
--   **`redis.test.ts`**: Verification of Redis connectivity and basic Store/Get operations.
--   **`error_handling.test.ts`**: Examples of global error handling (404 and 500).
--   **`pagination_validation.test.ts`**: Demonstration of form validation and API pagination metadata.
 
 ## 🛠️ Generating Code (Scaffolding)
 
