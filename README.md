@@ -197,44 +197,47 @@ We have provided a set of organized tests and examples in `src/examples/tests` t
 -   **`error_handling.test.ts`**: Examples of global error handling (404 and 500).
 -   **`pagination_validation.test.ts`**: Demonstration of form validation and API pagination metadata.
 
-## 📝 Tutorial: Creating a New Module
+## 🛠️ Generating Code (Scaffolding)
 
-You can easily generate a new module using the built-in CLI command. This command will create the necessary files and folders following the Clean Architecture structure.
+You can quickly scaffold new components using the built-in CLI commands. These commands ensure your code follows the **Clean Architecture** structure and project standards.
 
-```bash
-bun run make:module <module-name>
-```
+### 1. Generate Model (Full Stack)
 
-Example:
+Generates the complete database layer: **Migration**, **Sequelize Model**, and **Repository** (with DTO). It also automatically registers the model in the Sequelize configuration.
 
 ```bash
-bun run make:module product
+bun run make:model
 ```
 
-This will create:
+_Prompts: Migration name, Repository name, Table name._
 
--   `src/modules/product/product.ts`
--   `src/modules/product/delivery/http/handler.ts`
--   `src/modules/product/entity/interface.ts`
--   `src/modules/product/entity/schema.ts`
--   `src/modules/product/usecase/usecase.ts`
--   `src/database/repository/product/product.ts` (Implementation)
--   `src/database/repository/product/dto.ts` (Data Transfer Objects)
+### 2. Generate Module (Logic & Routing)
 
-After generation, you just need to implement your specific business logic in these files.
+Generates the business logic and API layer: **Module entry**, **Usecase**, **Handler**, and **Entities** (Interface/Schema). It also automatically registers the module in `app.ts`.
 
-## 📝 Tutorial: Creating a New Migration
+```bash
+bun run make:module
+```
 
-You can generate a new TypeScript migration file using the built-in CLI command. This ensures the file is correctly named with a timestamp and follows the project's standard.
+_Prompts: Module name, Repository name (to link the logic to data)._
+
+### 3. Generate Migration (Standalone)
+
+Generates **only** a timestamped TypeScript migration file for manual schema changes.
 
 ```bash
 bun run make:migration
 ```
 
-You will be prompted to enter a descriptive name for the migration (e.g., `create-users-table`).
+_Prompts: Migration name, Table name._
 
-Example Output:
-`src/database/sequelize/migrations/20231203153000-create-users-table.ts`
+### 4. Generate Cron Job
+
+Generates a new background task structure in `src/cron/`.
+
+```bash
+bun run make:cron
+```
 
 ## 🤝 Contributing
 

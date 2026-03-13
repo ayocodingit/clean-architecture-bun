@@ -1,6 +1,6 @@
 module.exports = function (plop) {
     plop.setGenerator('module', {
-        description: 'Generate a new module',
+        description: 'Generate a new module (Usecase + Handler)',
         prompts: [
             {
                 type: 'input',
@@ -51,16 +51,6 @@ module.exports = function (plop) {
                 pattern: /(\/\/ End Load Modules)/g,
                 template: 'new {{properCase name}}(logger, config, connection).RunHttp(http)\n    $1',
             },
-            {
-                type: 'add',
-                path: 'src/database/repository/{{camelCase repository}}/{{camelCase repository}}.ts',
-                templateFile: 'plop-templates/repository/repository.ts.hbs',
-            },
-            {
-                type: 'add',
-                path: 'src/database/repository/{{camelCase repository}}/dto.ts',
-                templateFile: 'plop-templates/repository/dto.ts.hbs',
-            },
         ],
     });
     plop.setHelper('timestamp', () => {
@@ -73,8 +63,6 @@ module.exports = function (plop) {
         const ss = String(now.getSeconds()).padStart(2, '0');
         return `${yyyy}${mm}${dd}${hh}${min}${ss}`;
     });
-
-
 
     plop.setGenerator('cron', {
         description: 'Generate a new cron job',
@@ -96,6 +84,31 @@ module.exports = function (plop) {
 
     plop.setGenerator('migration', {
         description: 'Generate a new migration',
+        prompts: [
+            {
+                type: 'input',
+                name: 'name',
+                message: 'Migration name please',
+                default: 'create-table',
+            },
+            {
+                type: 'input',
+                name: 'table',
+                message: 'Table name please',
+                default: 'posts',
+            },
+        ],
+        actions: [
+            {
+                type: 'add',
+                path: 'src/database/sequelize/migrations/{{timestamp}}-{{kebabCase name}}.ts',
+                templateFile: 'plop-templates/migration/migration.ts.hbs',
+            },
+        ],
+    });
+
+    plop.setGenerator('model', {
+        description: 'Generate a new migration + model + repository',
         prompts: [
             {
                 type: 'input',
