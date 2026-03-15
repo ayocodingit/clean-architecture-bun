@@ -18,8 +18,8 @@ class Category {
         connection: Connection
     ) {
         const schema = Sequelize.Models(connection)
-        const repository = new CategoryRepository(logger, schema)
-        this.usecase = new Usecase(logger, repository)
+        const categoryRepository = new CategoryRepository(logger, schema)
+        this.usecase = new Usecase(logger, categoryRepository)
     }
 
     public RunHttp(http: Http) {

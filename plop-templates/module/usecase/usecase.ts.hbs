@@ -6,15 +6,15 @@ import statusCode from '../../../pkg/statusCode'
 import Error from '../../../pkg/error'
 
 class Usecase {
-    constructor(private logger: Logger, private repository: {{pascalCase repository}}Repository) { }
+    constructor(private logger: Logger, private {{camelCase repository}}Repository: {{pascalCase repository}}Repository) { }
 
     public async Fetch(request: RequestParams<RequestQueryFetch>) {
-        const result = await this.repository.Fetch(request)
+        const result = await this.{{camelCase repository}}Repository.Fetch(request)
         return result
     }
 
     public async Show(id: number) {
-        const result = await this.repository.GetById(id)
+        const result = await this.{{camelCase repository}}Repository.GetById(id)
         if (!result) {
             throw new Error(statusCode.NOT_FOUND, statusCode[statusCode.NOT_FOUND])
         }
@@ -22,17 +22,17 @@ class Usecase {
     }
 
     public async Store(body: RequestBody) {
-        return this.repository.Store(body)
+        return this.{{camelCase repository}}Repository.Store(body)
     }
 
     public async Update(id: number, body: Update) {
         await this.Show(id)
-        return this.repository.Update(id, body)
+        return this.{{camelCase repository}}Repository.Update(id, body)
     }
 
     public async Delete(id: number) {
         await this.Show(id)
-        return this.repository.Delete(id)
+        return this.{{camelCase repository}}Repository.Delete(id)
     }
 }
 

@@ -18,8 +18,8 @@ class {{properCase name}} {
         connection: Connection
     ) {
         const schema = Sequelize.Models(connection)
-        const repository = new {{pascalCase repository}}Repository(logger, schema)
-        this.usecase = new Usecase(logger, repository)
+        const {{camelCase repository}}Repository = new {{pascalCase repository}}Repository(logger, schema)
+        this.usecase = new Usecase(logger, {{camelCase repository}}Repository)
     }
 
     public RunHttp(http: Http) {
