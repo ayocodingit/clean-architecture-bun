@@ -5,7 +5,7 @@
   "main": "main.js",
   "scripts": {
     "dev": "bun --watch src/app.ts",
-    "build": "bun build ./src/app.ts --outdir ./build --target bun",
+    "build": "bun build ./src/app.ts --outdir ./build --target bun --minify --sourcemap=none",
     "start": "bun ./build/app.js",
     "lint": "bunx prettier --check ./src",
     "lint:fix": "bunx prettier --write ./src",
