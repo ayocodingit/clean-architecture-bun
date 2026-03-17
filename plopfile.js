@@ -153,8 +153,8 @@ module.exports = function (plop) {
             {
                 type: 'modify',
                 path: 'src/database/sequelize/interface.ts',
-                pattern: /(\/\/ Add other models if needed)/g,
-                template: '{{camelCase repository}}: Model\n    $1',
+                pattern: /(category: Model\n    \/\/ tambah model lain)/g,
+                template: 'category: Model\n    {{camelCase repository}}: Model\n    // tambah model lain',
             },
             {
                 type: 'modify',
@@ -165,14 +165,14 @@ module.exports = function (plop) {
             {
                 type: 'modify',
                 path: 'src/database/sequelize/sequelize.ts',
-                pattern: /(\/\/ load all model on folder models)/g,
-                template: '$1\n        const {{camelCase repository}} = {{pascalCase repository}}(connection)',
+                pattern: /(const category = Category\(connection\)\n        \/\/ Tambah model lain)/g,
+                template: 'const category = Category(connection)\n        const {{camelCase repository}} = {{pascalCase repository}}(connection)\n        // Tambah model lain',
             },
             {
                 type: 'modify',
                 path: 'src/database/sequelize/sequelize.ts',
-                pattern: /(\/\/ Add other models if needed)/g,
-                template: '{{camelCase repository}},\n            $1',
+                pattern: /(const schema = \{\n            category,)/g,
+                template: 'const schema = {\n            category,\n            {{camelCase repository}},',
             },
         ],
     });

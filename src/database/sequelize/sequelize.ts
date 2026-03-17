@@ -3,6 +3,7 @@ import Logger from '../../pkg/logger'
 import { Sequelize as createConnection, Dialect, Op } from 'sequelize'
 import Category from './models/category'
 import { Connection } from './interface'
+import { setupRelations } from './relations'
 
 class SequelizeClient {
     public static async Connect({ db }: Config, logger: Logger) {
@@ -34,20 +35,17 @@ class SequelizeClient {
     }
 
     public static Models = (connection: Connection) => {
-        // load all model on folder models
         const category = Category(connection)
+        // Tambah model lain di sini, lalu daftarkan di interface.ts (type Schema)
 
-        // setup relation for eager loader in here
-        // example: User.hasOne(Profile)
-        return {
+        const schema = {
             category,
-            // Add other models if needed
-            // ...
-
-            // Add other require of the driver database
             connection,
             Op,
         }
+
+        setupRelations(schema)
+        return schema
     }
 
     public static Disconnect = (connection: Connection) => {
