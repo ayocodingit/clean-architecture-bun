@@ -45,9 +45,9 @@ export const GetMeta = (request: RequestMeta, count: number) => {
         last_page,
         per_page: request.per_page,
         from: request.offset + 1,
-        to: request.page * request.per_page,
+        to: Math.min(request.page * request.per_page, count),
         total: count,
         has_next: request.page < last_page,
-        has_prev: request.offset > 1,
+        has_prev: request.page > 1,
     }
 }

@@ -4,7 +4,7 @@ import { Sequelize as createConnection, Dialect, Op } from 'sequelize'
 import Category from './models/category'
 import { Connection } from './interface'
 
-class Sequalize {
+class SequelizeClient {
     public static async Connect({ db }: Config, logger: Logger) {
         const connection = new createConnection({
             logging: false,
@@ -55,4 +55,4 @@ class Sequalize {
     }
 }
 
-export default Sequalize
+export default SequelizeClient
