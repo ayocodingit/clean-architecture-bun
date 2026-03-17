@@ -21,18 +21,21 @@ sequelize/
 
 ## Menambah model baru
 
-1. **Buat file model** di `models/<nama>.ts`  
-   - Pakai `connection.define('nama_tabel', { ...attributes }, { timestamps, ... })`.  
-   - Export function yang terima `Connection` dan return hasil `define`.
+1. **Buat file model** di `models/<nama>.ts`
 
-2. **Daftarkan di `sequelize.ts`**  
-   - Import model, panggil `NamaModel(connection)`, masukkan ke object `schema` yang dikirim ke `setupRelations(schema)` dan di-return.
+    - Pakai `connection.define('nama_tabel', { ...attributes }, { timestamps, ... })`.
+    - Export function yang terima `Connection` dan return hasil `define`.
 
-3. **Daftarkan di `interface.ts`**  
-   - Tambah property di type `Schema`, mis. `nama: Model`, supaya repository dan TypeScript mengenal `schema.nama`.
+2. **Daftarkan di `sequelize.ts`**
 
-4. **(Opsional) Buat migrasi**  
-   - `bun run make:migration` atau `make:model`, lalu isi/cek file di `migrations/`.
+    - Import model, panggil `NamaModel(connection)`, masukkan ke object `schema` yang dikirim ke `setupRelations(schema)` dan di-return.
+
+3. **Daftarkan di `interface.ts`**
+
+    - Tambah property di type `Schema`, mis. `nama: Model`, supaya repository dan TypeScript mengenal `schema.nama`.
+
+4. **(Opsional) Buat migrasi**
+    - `bun run make:migration` atau `make:model`, lalu isi/cek file di `migrations/`.
 
 ---
 
@@ -51,7 +54,7 @@ export function setupRelations(schema: Schema): void {
 
 Setelah model di-load di `Models()`, object `schema` (berisi semua model) dikirim ke `setupRelations(schema)`, lalu schema yang sudah berelasi di-return. Dengan begitu:
 
-- **Define model** = di `models/*.ts` (struktur tabel).
-- **Define relation** = di `relations.ts` (hubungan antar tabel).
+-   **Define model** = di `models/*.ts` (struktur tabel).
+-   **Define relation** = di `relations.ts` (hubungan antar tabel).
 
 Eager loading (include) bisa dipakai di repository setelah relasi diset di sini.

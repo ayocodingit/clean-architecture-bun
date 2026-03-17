@@ -4,9 +4,9 @@ Layer akses data (persistence). **Independen dari module** — hanya bergantung 
 
 ## Konvensi
 
-- **Folder:** `[nama-entity]/` (mis. `category/`)
-- **repository.ts** — class `[Nama]Repository`, CRUD + query ke Sequelize
-- **types.ts** — kontrak input repository: `CreateXxxInput`, `UpdateXxxInput`, `ListXxxParams`. Menggambarkan kebutuhan DB/schema, tidak import dari module mana pun.
+-   **Folder:** `[nama-entity]/` (mis. `category/`)
+-   **repository.ts** — class `[Nama]Repository`, CRUD + query ke Sequelize
+-   **types.ts** — kontrak input repository: `CreateXxxInput`, `UpdateXxxInput`, `ListXxxParams`. Menggambarkan kebutuhan DB/schema, tidak import dari module mana pun.
 
 ## Contoh struktur
 
