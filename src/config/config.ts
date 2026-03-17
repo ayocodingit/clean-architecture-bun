@@ -1,9 +1,7 @@
-import dotenv from 'dotenv'
 import { Config } from './config.interface'
 import configValidate from './config.validate'
 
-dotenv.config()
-
+// Bun otomatis load .env dari root; tidak perlu paket dotenv
 const env = configValidate(process.env)
 
 const config: Config = {
