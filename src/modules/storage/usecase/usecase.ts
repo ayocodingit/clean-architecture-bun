@@ -2,10 +2,15 @@ import { CustomPathFile } from '../../../helpers/file'
 import statusCode from '../../../pkg/statusCode'
 import Error from '../../../pkg/error'
 
+export type UploadMetadata = {
+    description?: string
+    category?: string
+}
+
 class Usecase {
     constructor() {}
 
-    public async Upload(file: File) {
+    public async Upload(file: File, metadata?: UploadMetadata) {
         if (!file) {
             throw new Error(statusCode.BAD_REQUEST, 'File is required')
         }
@@ -17,9 +22,13 @@ class Usecase {
         await Bun.write(filename, file)
 
         return {
-            filename: filename,
+            filename,
             size: file.size,
             type: file.type,
+            ...(metadata && {
+                description: metadata.description,
+                category: metadata.category,
+            }),
         }
     }
 }
