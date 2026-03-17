@@ -153,8 +153,8 @@ module.exports = function (plop) {
             {
                 type: 'modify',
                 path: 'src/database/sequelize/interface.ts',
-                pattern: /(category: Model\n    \/\/ tambah model lain)/g,
-                template: 'category: Model\n    {{camelCase repository}}: Model\n    // tambah model lain',
+                pattern: /(export type Schema = \{\n    connection: Connection\n    Op: typeof Op\n})/g,
+                template: 'export type Schema = {\n    connection: Connection\n    Op: typeof Op\n    {{camelCase repository}}: Model\n    // tambah model: namaModel: Model\n}',
             },
             {
                 type: 'modify',
@@ -165,14 +165,8 @@ module.exports = function (plop) {
             {
                 type: 'modify',
                 path: 'src/database/sequelize/sequelize.ts',
-                pattern: /(const category = Category\(connection\)\n        \/\/ Tambah model lain)/g,
-                template: 'const category = Category(connection)\n        const {{camelCase repository}} = {{pascalCase repository}}(connection)\n        // Tambah model lain',
-            },
-            {
-                type: 'modify',
-                path: 'src/database/sequelize/sequelize.ts',
-                pattern: /(const schema = \{\n            category,)/g,
-                template: 'const schema = {\n            category,\n            {{camelCase repository}},',
+                pattern: /(public static Models = \(connection: Connection\) => \{\n        \/\/ Tambah model di sini \(dari make:model\), lalu daftarkan di interface\.ts \(type Schema\)\n        const schema = \{\n            connection,\n            Op,\n        \})/g,
+                template: 'public static Models = (connection: Connection) => {\n        // Tambah model di sini (dari make:model), lalu daftarkan di interface.ts (type Schema)\n        const {{camelCase repository}} = {{pascalCase repository}}(connection)\n        const schema = {\n            connection,\n            Op,\n            {{camelCase repository}},\n        }',
             },
         ],
     });
