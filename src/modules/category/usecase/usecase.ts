@@ -1,7 +1,7 @@
 import { RequestParams } from '../../../helpers/requestParams'
 import Logger from '../../../pkg/logger'
 import { RequestBody, RequestQueryFetch, Update } from '../entity/interface'
-import CategoryRepository from '../../../database/repository/category/category'
+import CategoryRepository from '../../../database/repository/category/repository'
 import statusCode from '../../../pkg/statusCode'
 import Error from '../../../pkg/error'
 

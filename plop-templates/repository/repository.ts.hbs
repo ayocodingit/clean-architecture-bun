@@ -1,15 +1,23 @@
 import Logger from '../../../pkg/logger'
 import { RequestParams } from '../../../helpers/requestParams'
 import { Schema } from '../../../database/sequelize/interface'
-import { Filter{{pascalCase repository}}Dto, {{pascalCase repository}}Dto } from './dto'
+import type {
+    Create{{pascalCase repository}}Input,
+    Update{{pascalCase repository}}Input,
+    {{pascalCase repository}}Filter,
+} from './types'
 
+/**
+ * Repository {{pascalCase repository}}: layer akses data (Sequelize).
+ * Fetch pakai RequestParams (helpers) + {{pascalCase repository}}Filter (custom filter di types).
+ */
 class {{pascalCase repository}}Repository {
     constructor(private logger: Logger, private schema: Schema) {}
 
-    public async Fetch(request: RequestParams<Filter{{pascalCase repository}}Dto>) {
+    public async Fetch(params: RequestParams<{{pascalCase repository}}Filter>) {
         const { count, rows } = await this.schema.{{camelCase repository}}.findAndCountAll({
-            limit: request.per_page,
-            offset: request.offset,
+            limit: params.per_page,
+            offset: params.offset,
         })
 
         return {
@@ -22,25 +30,28 @@ class {{pascalCase repository}}Repository {
         return this.schema.{{camelCase repository}}.findByPk(id)
     }
 
-    public async Store(body: {{pascalCase repository}}Dto){
+    public async Store(body: Create{{pascalCase repository}}Input) {
         return this.schema.{{camelCase repository}}.create({
             title: body.title,
             description: body.description,
         })
     }
 
-    public async Update(id: number, body: {{pascalCase repository}}Dto) {
-        return this.schema.{{camelCase repository}}.update({
-            title: body.title,
-            description: body.description,
-        }, {
-            where: { id }
-        })
+    public async Update(id: number, body: Update{{pascalCase repository}}Input) {
+        return this.schema.{{camelCase repository}}.update(
+            {
+                title: body.title,
+                description: body.description,
+            },
+            {
+                where: { id },
+            }
+        )
     }
 
     public async Delete(id: number) {
         return this.schema.{{camelCase repository}}.destroy({
-            where: { id }
+            where: { id },
         })
     }
 }

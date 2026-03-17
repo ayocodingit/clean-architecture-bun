@@ -1,0 +1,19 @@
+/**
+ * Kontrak input Repository {{pascalCase repository}} — hanya bergantung pada kebutuhan DB/schema.
+ */
+
+export type Create{{pascalCase repository}}Input = {
+    title: string
+    description: string
+}
+
+export type Update{{pascalCase repository}}Input = {
+    title: string
+    description: string
+}
+
+/** Custom filter untuk list (dikombinasi dengan RequestParams dari helpers) */
+export type {{pascalCase repository}}Filter = {
+    start_date?: string
+    // tambah field filter lain sesuai kebutuhan query
+}

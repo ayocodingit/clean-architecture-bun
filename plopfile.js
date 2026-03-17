@@ -137,13 +137,13 @@ module.exports = function (plop) {
             },
             {
                 type: 'add',
-                path: 'src/database/repository/{{camelCase repository}}/{{camelCase repository}}.ts',
+                path: 'src/database/repository/{{camelCase repository}}/repository.ts',
                 templateFile: 'plop-templates/repository/repository.ts.hbs',
             },
             {
                 type: 'add',
-                path: 'src/database/repository/{{camelCase repository}}/dto.ts',
-                templateFile: 'plop-templates/repository/dto.ts.hbs',
+                path: 'src/database/repository/{{camelCase repository}}/types.ts',
+                templateFile: 'plop-templates/repository/types.ts.hbs',
             },
             {
                 type: 'add',

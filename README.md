@@ -6,244 +6,177 @@
 [![Maintainability](https://api.codeclimate.com/v1/badges/12c10806992f9baa009f/maintainability)](https://codeclimate.com/github/ayocodingit/boilerplate-clean-architecture/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/12c10806992f9baa009f/test_coverage)](https://codeclimate.com/github/ayocodingit/boilerplate-clean-architecture/test_coverage)
 
-## 📖 Introduction
+Boilerplate berbasis **Clean Architecture** untuk runtime **Bun**, dengan lapisan yang jelas dan siap dipakai untuk pengembangan fitur baru.
 
-This boilerplate is a robust and scalable foundation for building applications using **Clean Architecture** principles, powered by the **Bun** runtime. It is designed to help developers create maintainable, testable, and loosely coupled systems.
+---
 
-By separating concerns into distinct layers (Entities, Use Cases, Interface Adapters, Frameworks), this boilerplate ensures that your business logic remains independent of frameworks, databases, and external agencies.
+## Daftar isi
 
-## 🚀 Why use this boilerplate?
+- [Kenapa pakai boilerplate ini?](#-kenapa-pakai-boilerplate-ini)
+- [Tech stack](#-tech-stack)
+- [Struktur folder](#-struktur-folder)
+- [Installasi & setup](#-installasi--setup)
+- [Scripts & perintah](#-scripts--perintah)
+- [Generate code (scaffolding)](#-generate-code-scaffolding)
+- [Testing](#-testing)
+- [Lisensi](#-lisensi)
 
--   **Separation of Concerns**: Business rules are isolated from implementation details.
--   **Testability**: The architecture makes it easy to test business logic without UI, database, or web server.
--   **Scalability**: Easy to add new features and maintain existing ones as the project grows.
--   **Type Safety**: Built with **TypeScript** for better developer experience and code reliability.
--   **Database Agnostic**: While it comes with **Sequelize**, the repository pattern allows you to switch databases with minimal impact on business logic.
--   **Ready-to-use Features**: Includes Docker support, linting, migration tools, and more.
+---
 
-## ✨ Features
+## 🚀 Kenapa pakai boilerplate ini?
 
--   **Clean Architecture Layers**:
-    -   **Entities**: Enterprise business rules.
-    -   **Use Cases**: Application business rules.
-    -   **Interface Adapters**: Controllers, Gateways, Presenters.
-    -   **Frameworks & Drivers**: Web Framework (Express), Database (Sequelize), etc.
--   **Tech Stack**:
-    -   **Runtime**: Bun v1.3+
-    -   **Language**: TypeScript (Native Support)
-    -   **Framework**: ElysiaJS (High Performance)
-    -   **ORM**: Sequelize (SQL)
-    -   **Containerization**: Docker (Bun Alpine)
-    -   **Testing**: Bun Test (Native)
-    -   **HTTP Client**: Native Fetch API
-    -   **File Upload**: Bun Native (Zero-copy)
-    -   **Logging**: Winston
-    -   **Validation**: Joi
+- **Pemisahan lapisan**: Aturan bisnis terpisah dari framework, DB, dan HTTP.
+- **Mudah di-test**: Use case dan repository bisa di-test tanpa server atau DB nyata.
+- **Type-safe**: TypeScript di seluruh codebase.
+- **Repository independen**: Layer repository hanya bergantung pada schema/DB dan types sendiri, tidak ke module tertentu.
+- **Siap dipakai**: Migrasi, validasi (Joi), logging (Winston), CORS, Swagger, cron, seed.
 
-## 📂 Folder Structure & Architecture
+---
 
-This boilerplate strictly adheres to the **Clean Architecture** pattern. The core principle is the **Dependency Rule**: _Dependencies only point inwards._ Inner layers (Entities & Use Cases) have no knowledge of outer layers (Frameworks & Drivers).
+## ✨ Tech stack
 
-### 🏗️ Directory Overview
+| Bagian        | Teknologi        |
+|---------------|------------------|
+| Runtime       | Bun v1.3+        |
+| Bahasa        | TypeScript       |
+| Framework HTTP| ElysiaJS         |
+| ORM           | Sequelize        |
+| Validasi      | Joi              |
+| Logging       | Winston          |
+| Testing       | Bun Test         |
 
-```text
+---
+
+## 📂 Struktur folder
+
+```
 src/
-├── config/             # App configuration & ENV management
-├── cron/               # Background & Scheduled tasks
-├── database/           # Data Persistence Layer
-│   ├── repository/     # Interface Adapters: Database implementations
-│   └── sequelize/      # Infrastructure: Models & Migrations
-├── helpers/            # Pure utility functions (Dates, Request parsing)
-├── modules/            # BUSINESS CORE (Encapsulated feature modules)
-├── pkg/                # Shared internal library (Logger, JWT, Error)
-├── transport/          # Outer Layer: HTTP Server setup & Routing
-├── app.ts              # Entry point: App Bootstrapper
-└── migrater.ts         # CLI Tool: Database Migration engine
+├── config/             # Konfigurasi app & validasi env
+├── cron/               # Job terjadwal (cron)
+├── database/
+│   ├── repository/     # Layer akses data (per entity: repository.ts + types.ts)
+│   └── sequelize/      # Koneksi, model, migrasi
+├── helpers/            # Util (request params, validasi, date, dll)
+├── modules/            # Fitur per domain (entity, usecase, delivery/http)
+├── pkg/                # Logger, JWT, Error
+├── transport/          # Setup HTTP (Elysia), middleware
+├── app.ts              # Entry point
+└── migrater.ts         # CLI migrasi DB (up/down)
 ```
 
-### 🛡️ Clean Architecture Layers
+Lapisan Clean Architecture: **Entity → Use Case → Interface Adapters (Handler, Repository) → Frameworks (HTTP, Sequelize)**. Dependency mengalir ke dalam (inner tidak kenal outer).
 
-#### 1. Entities (`src/modules/*/entity`)
+---
 
-**Enterprise Business Rules**: The most stable layer. Contains data structures (Interfaces) and business validation rules (Joi Schemas).
+## 🛠️ Installasi & setup
 
--   **Interface**: Defines the shape of the data used across the module.
--   **Schema**: Joi validation schemas for incoming data (Store, Update, Params).
-
-#### 2. Use Cases (`src/modules/*/usecase`)
-
-**Application Business Logic**: Orchestrates the flow of data to and from entities.
-
--   Implements specific business rules.
--   Interacts with **Repository interfaces** to perform data operations.
--   Throws meaningful errors that are caught by the delivery layer.
-
-#### 3. Interface Adapters (`src/database/repository` & `src/modules/*/delivery`)
-
-**The Bridges**:
-
--   **Delivery (HTTP Handler)**: Translates Elysia context (params, body, query) into Use Case inputs. It handles HTTP status codes and response formatting.
--   **Repositories**: Implements data persistence logic. It interacts with Sequelize models to perform CRUD operations.
-
-#### 4. Frameworks & Drivers (`src/transport/http` & `src/database/sequelize`)
-
-**The Infrastructure**:
-
--   **Transport**: Configuration of the Elysia server, global middlewares, and route registration.
--   **Sequelize**: Database connection, connection pooling, and model definitions.
-
-### 🧩 Module Deep-Dive
-
-Each directory in `src/modules/` is a self-contained feature module:
-
--   `[module].ts`: The **Module Registry**. It performs manual dependency injection by instantiating the Repository, Usecase, and Handler, then registers the routes.
--   `usecase/usecase.ts`: Centralizes logic for the feature.
--   `delivery/http/handler.ts`: Handles ElysiaJS requests.
--   `entity/interface.ts`: Defines TypeScript interfaces.
--   `entity/schema.ts`: Defines Joi validation schemas.
-
-## 🛠️ Installation & Setup
-
-### Prerequisites
-
--   [Bun](https://bun.sh/) (v1.3 or higher)
--   [Docker](https://www.docker.com/) (optional, for containerized run)
-
-### Steps
-
-1.  **Clone the repository:**
-
-    ```bash
-    git clone https://github.com/ayocodingit/clean-architecture-bun.git
-    cd clean-architecture-bun
-    ```
-
-2.  **Install dependencies:**
-
-    ```bash
-    bun install
-    ```
-
-3.  **Environment Configuration:**
-
-    Copy the example environment file and update it with your credentials.
-
-    ```bash
-    cp .env.example .env
-    ```
-
-4.  **Database Setup:**
-
-    Ensure your database is running (update `.env` with DB credentials). Then run migrations:
-
-    ```bash
-    bun run migrate
-    ```
-
-    (Optional) Seed the database:
-
-    ```bash
-    bun run seed:run --name=your-seed-filename
-    ```
-
-## 🏃 Usage
-
-### Development Mode
-
-Runs the application with hot-reloading.
+**Prasyarat:** [Bun](https://bun.sh/) v1.3+
 
 ```bash
-bun run dev
+git clone https://github.com/ayocodingit/clean-architecture-bun.git
+cd clean-architecture-bun
+bun install
+cp .env.example .env
+# Edit .env (DB, JWT, dll)
+bun run migrate
 ```
 
-### Production Build
+---
 
-Builds the TypeScript code to JavaScript.
+## 🏃 Scripts & perintah
 
-```bash
-bun run build
-```
+| Perintah | Deskripsi |
+|----------|-----------|
+| `bun run dev` | Jalankan app (watch mode) |
+| `bun run build` | Build ke `./build` |
+| `bun start` | Jalankan hasil build (`./build/app.js`) |
+| `bun run migrate` | Jalankan migrasi DB (up) |
+| `bun run migrate:rollback` | Rollback satu migrasi (down) |
+| `bun run make:model` | Generate model + migrasi + repository (lihat bawah) |
+| `bun run make:module` | Generate module (usecase + handler + entity) |
+| `bun run make:migration` | Generate file migrasi kosong |
+| `bun run make:cron` | Generate file cron kosong |
+| `bun run seed:run --name=<nama>` | Jalankan seed (nama file tanpa ekstensi) |
+| `bun run cron:run --name=<nama>` | Jalankan satu cron (nama file tanpa ekstensi) |
+| `bun test` / `bun run test:unit` | Jalankan test (helpers) |
+| `bun run lint` | Cek format (Prettier) |
+| `bun run lint:fix` | Perbaiki format otomatis |
 
-Start the built application:
+---
 
-```bash
-bun start
-```
+## 🛠️ Generate code (scaffolding)
 
-### Docker
+Semua generator memakai **Plop** dan menyesuaikan struktur Clean Architecture di repo ini.
 
-Build and run the application using Docker.
+### 1. `bun run make:model` — Layer database + repository
 
-```bash
-# Build image
-docker build -t my-app -f docker/Dockerfile .
+Menambah **satu entity** di sisi persistence:
 
-# Run container
-docker run -p 3000:3000 -d my-app
-```
+- **Migrasi** – `src/database/sequelize/migrations/<timestamp>-<name>.ts` (up/down)
+- **Model Sequelize** – `src/database/sequelize/models/<repository>.ts`
+- **Repository** – `src/database/repository/<repository>/repository.ts` (class `XxxRepository`)
+- **Types repository** – `src/database/repository/<repository>/types.ts` (`CreateXxxInput`, `UpdateXxxInput`, `XxxFilter`)
+
+Model dan repository otomatis didaftar di `src/database/sequelize/interface.ts` dan `sequelize.ts`.
+
+**Prompt:**
+
+- Migration name (contoh: `create-posts`)
+- Repository name (contoh: `post`) → dipakai untuk nama folder, class, dan model
+- Table name (contoh: `posts`) → nama tabel di DB
+
+**Contoh:** Repository name `post`, table `posts` → folder `repository/post/`, model `models/post.ts`, tabel `posts`.
+
+---
+
+### 2. `bun run make:module` — Layer bisnis + HTTP
+
+Menambah **satu fitur** (module) di sisi aplikasi:
+
+- **Entry module** – `src/modules/<name>/<name>.ts` (registrasi route & inject repository, usecase, handler)
+- **Usecase** – `src/modules/<name>/usecase/usecase.ts`
+- **Handler HTTP** – `src/modules/<name>/delivery/http/handler.ts`
+- **Entity** – `src/modules/<name>/entity/interface.ts` dan `schema.ts` (Joi)
+
+Module otomatis di-import dan didaftar di `src/app.ts`.
+
+**Prompt:**
+
+- Module name (contoh: `post`) → route mis. `/v1/posts`, `/v1/public/posts`
+- Repository name (contoh: `post`) → harus sudah ada dari `make:model`, dipakai untuk inject `PostRepository`
+
+**Penting:** Jalankan `make:model` dulu untuk repository yang dipakai module ini.
+
+---
+
+### 3. `bun run make:migration` — Hanya file migrasi
+
+Hanya menambah **satu file migrasi** di `src/database/sequelize/migrations/` (up/down kosong, isi manual).
+
+**Prompt:** Migration name, Table name.
+
+---
+
+### 4. `bun run make:cron` — Job cron
+
+Menambah **satu file cron** di `src/cron/<name>.cron.ts`.
+
+**Prompt:** Cron job name (contoh: `sync-users`).
+
+---
 
 ## 🧪 Testing
 
-Automated tests are exclusively focused on core utility functions in the `src/helpers` directory.
-
-To run tests:
+Test fokus ke helper di `src/helpers`:
 
 ```bash
 bun test
-```
-
-or
-
-```bash
+# atau
 bun run test:unit
 ```
 
-## 🛠️ Generating Code (Scaffolding)
+---
 
-You can quickly scaffold new components using the built-in CLI commands. These commands ensure your code follows the **Clean Architecture** structure and project standards.
+## 📄 Lisensi
 
-### 1. Generate Model (Full Stack)
-
-Generates the complete database layer: **Migration**, **Sequelize Model**, and **Repository** (with DTO). It also automatically registers the model in the Sequelize configuration.
-
-```bash
-bun run make:model
-```
-
-_Prompts: Migration name, Repository name, Table name._
-
-### 2. Generate Module (Logic & Routing)
-
-Generates the business logic and API layer: **Module entry**, **Usecase**, **Handler**, and **Entities** (Interface/Schema). It also automatically registers the module in `app.ts`.
-
-```bash
-bun run make:module
-```
-
-_Prompts: Module name, Repository name (to link the logic to data)._
-
-### 3. Generate Migration (Standalone)
-
-Generates **only** a timestamped TypeScript migration file for manual schema changes.
-
-```bash
-bun run make:migration
-```
-
-_Prompts: Migration name, Table name._
-
-### 4. Generate Cron Job
-
-Generates a new background task structure in `src/cron/`.
-
-```bash
-bun run make:cron
-```
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## 📄 License
-
-This project is licensed under the MIT License.
+MIT.

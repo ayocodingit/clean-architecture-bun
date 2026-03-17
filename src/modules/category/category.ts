@@ -6,7 +6,7 @@ import { VerifyAuth } from '../../transport/http/middleware/verifyAuth'
 import { Config } from '../../config/config.interface'
 import Jwt from '../../pkg/jwt'
 import { Connection } from '../../database/sequelize/interface'
-import CategoryRepository from '../../database/repository/category/category'
+import CategoryRepository from '../../database/repository/category/repository'
 import Sequelize from '../../database/sequelize/sequelize'
 
 class Category {
