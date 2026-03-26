@@ -122,7 +122,11 @@ class Http {
         }
     }
 
-    public SetRouter(prefix: string, handler: Elysia<any>, opts?: SetRouterOptions) {
+    public SetRouter(
+        prefix: string,
+        handler: Elysia<any>,
+        opts?: SetRouterOptions
+    ) {
         const path = (this.config.app.prefix + prefix).replace(/\/+/g, '/')
         const mount = new Elysia({ prefix: path })
 
@@ -130,7 +134,9 @@ class Http {
             mount.guard(
                 {
                     detail: {
-                        tags: Array.isArray(opts.tags) ? opts.tags : [opts.tags],
+                        tags: Array.isArray(opts.tags)
+                            ? opts.tags
+                            : [opts.tags],
                     },
                 },
                 (app) => app.use(handler)
