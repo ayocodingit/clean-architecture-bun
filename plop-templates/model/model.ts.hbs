@@ -8,11 +8,12 @@ const {{ pascalCase repository }} = (connection: Connection) => {
             id: {
                 primaryKey: true,
                 type: DataTypes.STRING,
-                defaultValue: DataTypes.UUIDV4,
+                defaultValue: Bun.randomUUIDv7(),
             },
         },
         {
             timestamps: true,
+            freezeTableName: true,
             createdAt: 'created_at',
             updatedAt: 'updated_at',
         }
