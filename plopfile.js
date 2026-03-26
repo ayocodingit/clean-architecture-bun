@@ -1,13 +1,4 @@
 module.exports = function (plop) {
-    const parseRepositories = (input) => {
-        if (!input) return [];
-        if (Array.isArray(input)) return input;
-        return String(input)
-            .split(',')
-            .map((s) => s.trim())
-            .filter(Boolean);
-    };
-
     plop.setGenerator('module', {
         description: 'Generate a new module (Usecase + Handler)',
         prompts: [
@@ -18,10 +9,8 @@ module.exports = function (plop) {
             },
             {
                 type: 'input',
-                name: 'repositories',
-                message: 'Repository name(s) (comma separated, optional)',
-                default: '',
-                filter: (input) => parseRepositories(input),
+                name: 'repository',
+                message: 'Repository name please',
             },
         ],
         actions: [
@@ -34,6 +23,11 @@ module.exports = function (plop) {
                 type: 'add',
                 path: 'src/modules/{{camelCase name}}/delivery/http/handler.ts',
                 templateFile: 'plop-templates/module/delivery/http/handler.ts.hbs',
+            },
+            {
+                type: 'add',
+                path: 'src/modules/{{camelCase name}}/delivery/http/contract.ts',
+                templateFile: 'plop-templates/module/delivery/http/contract.ts.hbs',
             },
             {
                 type: 'add',
@@ -64,10 +58,6 @@ module.exports = function (plop) {
             },
         ],
     });
-
-    plop.setHelper('repoCount', (repos) => parseRepositories(repos).length);
-    plop.setHelper('eq', (a, b) => a === b);
-
     plop.setHelper('timestamp', () => {
         const now = new Date();
         const yyyy = now.getFullYear();

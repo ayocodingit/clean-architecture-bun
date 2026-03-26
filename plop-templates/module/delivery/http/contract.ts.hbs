@@ -1,0 +1,71 @@
+import { t } from 'elysia'
+
+export const {{properCase name}}HttpContract = {
+    Entity: t.Object({
+        id: t.String(),
+        title: t.String(),
+        description: t.String(),
+        created_at: t.Optional(t.String()),
+        updated_at: t.Optional(t.String()),
+    }),
+
+    Meta: t.Object({
+        current_page: t.Numeric(),
+        last_page: t.Numeric(),
+        per_page: t.Numeric(),
+        from: t.Numeric(),
+        to: t.Numeric(),
+        total: t.Numeric(),
+        has_next: t.Boolean(),
+        has_prev: t.Boolean(),
+    }),
+
+    QueryList: t.Object({
+        page: t.Optional(t.Numeric()),
+        per_page: t.Optional(t.Numeric()),
+        sort_by: t.Optional(t.String()),
+        sort_order: t.Optional(
+            t.Union([t.Literal('asc'), t.Literal('desc')])
+        ),
+        q: t.Optional(t.String()),
+    }),
+
+    ParamsId: t.Object({
+        id: t.Numeric(),
+    }),
+
+    BodyCreate: t.Object({
+        title: t.String(),
+        description: t.String(),
+    }),
+
+    BodyUpdate: t.Object({
+        title: t.Optional(t.String()),
+        description: t.Optional(t.String()),
+    }),
+
+    ResponseList200: null as any,
+    ResponseShow200: null as any,
+    ResponseCreate201: null as any,
+    ResponseUpdate200: null as any,
+    ResponseDelete200: null as any,
+} as const
+
+;({{properCase name}}HttpContract as any).ResponseList200 = t.Object({
+    meta: {{properCase name}}HttpContract.Meta,
+    data: t.Array({{properCase name}}HttpContract.Entity),
+})
+;({{properCase name}}HttpContract as any).ResponseShow200 = t.Object({
+    data: {{properCase name}}HttpContract.Entity,
+})
+;({{properCase name}}HttpContract as any).ResponseCreate201 = t.Object({
+    data: {{properCase name}}HttpContract.Entity,
+    message: t.String(),
+})
+;({{properCase name}}HttpContract as any).ResponseUpdate200 = t.Object({
+    message: t.String(),
+})
+;({{properCase name}}HttpContract as any).ResponseDelete200 = t.Object({
+    message: t.String(),
+})
+

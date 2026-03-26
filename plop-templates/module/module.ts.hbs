@@ -6,10 +6,9 @@ import { VerifyAuth } from '../../transport/http/middleware/verifyAuth'
 import { Config } from '../../config/config.interface'
 import Jwt from '../../pkg/jwt'
 import { Connection } from '../../database/sequelize/interface'
+import {{pascalCase repository}}Repository from '../../database/repository/{{camelCase repository}}/repository'
 import Sequelize from '../../database/sequelize/sequelize'
-{{#each repositories}}
-import {{pascalCase this}}Repository from '../../database/repository/{{camelCase this}}/repository'
-{{/each}}
+import { {{properCase name}}HttpContract as C } from './delivery/http/contract'
 
 class {{properCase name}} {
     private usecase: Usecase
@@ -20,17 +19,8 @@ class {{properCase name}} {
         connection: Connection
     ) {
         const schema = Sequelize.Models(connection)
-{{#if (eq (repoCount repositories) 1)}}
-        const {{camelCase (lookup repositories 0)}}Repository = new {{pascalCase (lookup repositories 0)}}Repository(logger, schema)
-        this.usecase = new Usecase(logger, {{camelCase (lookup repositories 0)}}Repository)
-{{else}}
-{{#each repositories}}
-        const {{camelCase this}}Repository = new {{pascalCase this}}Repository(logger, schema)
-{{/each}}
-        this.usecase = new Usecase(
-            logger{{#each repositories}}, {{camelCase this}}Repository{{/each}}
-        )
-{{/if}}
+        const {{camelCase repository}}Repository = new {{pascalCase repository}}Repository(logger, schema)
+        this.usecase = new Usecase(logger, {{camelCase repository}}Repository)
     }
 
     public RunHttp(http: Http) {
@@ -43,8 +33,20 @@ class {{properCase name}} {
     private httpPublic(handler: Handler, http: Http) {
         const Router = http.Router()
 
-        Router.get('/', handler.Fetch)
-        Router.get('/:id', handler.Show)
+        Router.get('/', handler.Fetch, {
+            query: C.QueryList,
+            response: {
+                200: C.ResponseList200,
+            },
+            detail: { summary: 'List {{camelCase name}} (public)' },
+        })
+        Router.get('/:id', handler.Show, {
+            params: C.ParamsId,
+            response: {
+                200: C.ResponseShow200,
+            },
+            detail: { summary: 'Get {{camelCase name}} by id (public)' },
+        })
 
         http.SetRouter('/v1/public/{{camelCase name}}', Router, { tags: '{{properCase name}}' })
     }
@@ -54,10 +56,35 @@ class {{properCase name}} {
         const jwt = new Jwt(this.config.jwt.access_key)
         const auth = VerifyAuth(jwt)
 
-        Router.onBeforeHandle(auth).get('/', handler.Fetch)
-        Router.onBeforeHandle(auth).post('/', handler.Store)
-        Router.onBeforeHandle(auth).patch('/:id', handler.Update)
-        Router.onBeforeHandle(auth).delete('/:id', handler.Delete)
+        Router.onBeforeHandle(auth).get('/', handler.Fetch, {
+            query: C.QueryList,
+            response: {
+                200: C.ResponseList200,
+            },
+            detail: { summary: 'List {{camelCase name}} (protected)' },
+        })
+        Router.onBeforeHandle(auth).post('/', handler.Store, {
+            body: C.BodyCreate,
+            response: {
+                201: C.ResponseCreate201,
+            },
+            detail: { summary: 'Create {{camelCase name}} (protected)' },
+        })
+        Router.onBeforeHandle(auth).patch('/:id', handler.Update, {
+            params: C.ParamsId,
+            body: C.BodyUpdate,
+            response: {
+                200: C.ResponseUpdate200,
+            },
+            detail: { summary: 'Update {{camelCase name}} (protected)' },
+        })
+        Router.onBeforeHandle(auth).delete('/:id', handler.Delete, {
+            params: C.ParamsId,
+            response: {
+                200: C.ResponseDelete200,
+            },
+            detail: { summary: 'Delete {{camelCase name}} (protected)' },
+        })
 
         http.SetRouter('/v1/{{camelCase name}}', Router, { tags: '{{properCase name}}' })
     }
