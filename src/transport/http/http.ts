@@ -12,6 +12,10 @@ type responseError = {
     errors?: object
 }
 
+type SetRouterOptions = {
+    tags?: string | string[]
+}
+
 class Http {
     public app: Elysia
 
@@ -118,9 +122,24 @@ class Http {
         }
     }
 
-    public SetRouter(prefix: string, handler: Elysia<any>) {
+    public SetRouter(prefix: string, handler: Elysia<any>, opts?: SetRouterOptions) {
         const path = (this.config.app.prefix + prefix).replace(/\/+/g, '/')
-        this.app.use(new Elysia({ prefix: path }).use(handler))
+        const mount = new Elysia({ prefix: path })
+
+        if (opts?.tags) {
+            mount.guard(
+                {
+                    detail: {
+                        tags: Array.isArray(opts.tags) ? opts.tags : [opts.tags],
+                    },
+                },
+                (app) => app.use(handler)
+            )
+        } else {
+            mount.use(handler)
+        }
+
+        this.app.use(mount)
     }
 
     public Tag(tags: string | string[]) {
