@@ -51,17 +51,27 @@ Boilerplate berbasis **Clean Architecture** untuk runtime **Bun**, dengan lapisa
 
 ```
 src/
-├── config/             # Konfigurasi app & validasi env
-├── cron/               # Job terjadwal (cron)
+├── app.ts                      # Entry point
+├── config/                     # Konfigurasi app + validasi env
+├── cron/                       # Job terjadwal (cron)
 ├── database/
-│   ├── repository/     # Layer akses data (per entity: repository.ts + types.ts)
-│   └── sequelize/      # Koneksi, model, migrasi
-├── helpers/            # Util (request params, validasi, date, dll)
-├── modules/            # Fitur per domain (entity, usecase, delivery/http)
-├── pkg/                # Logger, JWT, Error
-├── transport/          # Setup HTTP (Elysia), middleware
-├── app.ts              # Entry point
-└── migrater.ts         # CLI migrasi DB (up/down)
+│   ├── repository/             # Layer akses data per entity (repository.ts + types.ts)
+│   │   └── category/
+│   └── sequelize/              # Koneksi Sequelize, model, relasi, migrasi
+│       ├── models/
+│       ├── migrations/
+│       ├── interface.ts
+│       ├── relations.ts
+│       └── sequelize.ts
+├── external/                   # Integrasi eksternal (contoh: redis)
+├── helpers/                    # Utility (request params, validasi, date, regex, dll)
+├── modules/                    # Fitur/domain (entity, usecase, delivery/http)
+│   ├── category/
+│   └── storage/
+├── pkg/                        # Shared package (logger, jwt, status code, error, i18n)
+├── transport/                  # Setup HTTP (Elysia), middleware
+├── migrater.ts                 # CLI migrasi DB (up/down)
+└── examples/                   # Contoh penggunaan
 ```
 
 Lapisan Clean Architecture: **Entity → Use Case → Interface Adapters (Handler, Repository) → Frameworks (HTTP, Sequelize)**. Dependency mengalir ke dalam (inner tidak kenal outer).
@@ -88,7 +98,7 @@ bun run migrate
 | Perintah | Deskripsi |
 |----------|-----------|
 | `bun run dev` | Jalankan app (watch mode) |
-| `bun run build` | Build ke `./build` |
+| `bun run build` | Build production (minify) ke `./build` |
 | `bun start` | Jalankan hasil build (`./build/app.js`) |
 | `bun run migrate` | Jalankan migrasi DB (up) |
 | `bun run migrate:rollback` | Rollback satu migrasi (down) |
@@ -143,9 +153,15 @@ Module otomatis di-import dan didaftar di `src/app.ts`.
 **Prompt:**
 
 - Module name (contoh: `post`) → route mis. `/v1/posts`, `/v1/public/posts`
-- Repository name (contoh: `post`) → harus sudah ada dari `make:model`, dipakai untuk inject `PostRepository`
+- Repository name(s) (opsional, dipisah koma)  
+  contoh: `post` atau `post,user` atau kosong
 
-**Penting:** Jalankan `make:model` dulu untuk repository yang dipakai module ini.
+**Perilaku generator:**
+
+- Jika diisi **1 repository** (contoh `post`): template usecase CRUD otomatis terhubung ke `PostRepository`.
+- Jika diisi **lebih dari 1 repository** (contoh `post,user`) atau **kosong**: semua repository (jika ada) tetap di-import/inject, tetapi method usecase dibuat sebagai skeleton (`NOT_IMPLEMENTED`) agar bisa kamu isi manual sesuai flow bisnis module.
+
+**Penting:** Repository yang kamu isi tetap harus sudah ada (buat dulu via `make:model` atau manual).
 
 ---
 
