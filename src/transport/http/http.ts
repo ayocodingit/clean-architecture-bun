@@ -30,6 +30,7 @@ class Http {
         this.app.use(cors())
         this.app.use(
             swagger({
+                provider: 'scalar',
                 documentation: {
                     info: {
                         title: this.config.app.name,
@@ -37,6 +38,7 @@ class Http {
                     },
                 },
                 path: '/docs',
+                scalarConfig: { spec: { url: 'json' } },
             })
         )
     }
