@@ -46,7 +46,7 @@ class {{properCase name}} {
         Router.get('/', handler.Fetch)
         Router.get('/:id', handler.Show)
 
-        http.SetRouter('/v1/public/{{camelCase name}}s/', Router)
+        http.SetRouter('/v1/public/{{camelCase name}}', Router)
     }
 
     public httpPrivate(handler: Handler, http: Http) {
@@ -59,7 +59,7 @@ class {{properCase name}} {
         Router.onBeforeHandle(auth).patch('/:id', handler.Update)
         Router.onBeforeHandle(auth).delete('/:id', handler.Delete)
 
-        http.SetRouter('/v1/{{camelCase name}}s/', Router)
+        http.SetRouter('/v1/{{camelCase name}}', Router)
     }
 }
 
