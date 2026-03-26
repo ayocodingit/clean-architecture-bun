@@ -123,6 +123,12 @@ class Http {
         this.app.use(new Elysia({ prefix: path }).use(handler))
     }
 
+    public Tag(tags: string | string[]) {
+        return {
+            detail: { tags: Array.isArray(tags) ? tags : [tags] },
+        }
+    }
+
     public Router() {
         return new Elysia()
     }
