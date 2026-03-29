@@ -26,7 +26,7 @@ class Handler {
                 additional_info: this.http.AdditionalInfo(ctx, statusCode.OK),
             })
 
-            return { data, meta: GetMeta(request, count) }
+            return { meta: GetMeta(request, count), data }
         } catch (error) {
             throw error
         }
