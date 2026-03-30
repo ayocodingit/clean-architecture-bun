@@ -4,7 +4,7 @@ import statusCode from '../../../pkg/statusCode'
 import Jwt from '../../../pkg/jwt'
 
 export const VerifyAuth = (jwt: Jwt) => {
-    return async (ctx: Context) => {
+    return async (ctx: any) => {
         const authorization = ctx.request.headers.get('authorization')
 
         if (!authorization) {
@@ -31,8 +31,6 @@ export const VerifyAuth = (jwt: Jwt) => {
             )
         }
 
-        return {
-            user: decode,
-        }
+        ctx.user = decode
     }
 }
