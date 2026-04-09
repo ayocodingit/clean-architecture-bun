@@ -31,6 +31,9 @@ class Http {
     }
 
     private plugins() {
+        const docsPath = '/docs'
+        const specUrl = `${docsPath}/json`
+
         this.app.use(cors())
         this.app.use(
             swagger({
@@ -41,8 +44,11 @@ class Http {
                         version: '1.0.0',
                     },
                 },
-                path: '/docs',
-                scalarConfig: { spec: { url: 'json' } },
+                path: docsPath,
+                specPath: specUrl,
+                scalarConfig: {
+                    spec: { url: specUrl },
+                },
             })
         )
     }
