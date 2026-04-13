@@ -67,12 +67,11 @@ src/
 ├── external/                   # Integrasi eksternal (contoh: redis)
 ├── helpers/                    # Utility (request params, validasi, date, regex, dll)
 ├── modules/                    # Fitur/domain (entity, usecase, delivery/http)
-│   ├── category/
-│   └── storage/
+│   └── category/
 ├── pkg/                        # Shared package (logger, jwt, status code, error, i18n)
 ├── transport/                  # Setup HTTP (Elysia), middleware
 ├── migrater.ts                 # CLI migrasi DB (up/down)
-└── examples/                   # Contoh penggunaan
+└── examples/                   # Contoh (curl, upload file); lihat README di folder
 ```
 
 ---

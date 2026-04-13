@@ -31,9 +31,8 @@ coverage/
 *.swp
 *.swo
 
-# Uploads
-uploads/*
-!uploads/.gitkeep
+# Local file storage (runtime; was uploads/)
+storage/
 
 # Docker
 .docker

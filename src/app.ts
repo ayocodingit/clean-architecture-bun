@@ -3,7 +3,6 @@ import Sequelize from './database/sequelize/sequelize'
 import Logger from './pkg/logger'
 
 import Category from './modules/category/category'
-import Storage from './modules/storage/storage'
 import Http from './transport/http/http'
 
 const Run = async () => {
@@ -15,7 +14,6 @@ const Run = async () => {
     // Start Load Modules
     new Category(logger, config, connection).RunHttp(http)
 
-    new Storage(logger, config).RunHttp(http)
     // End Load Modules
 
     // The http.Run() method is likely intended to set up routes or middleware,

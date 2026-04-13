@@ -4,7 +4,7 @@ import { CustomPathFile, GetFiletype } from './file'
 
 describe('CustomPathFile function', () => {
     it('should include a timestamp and the correct filename', () => {
-        const path = 'uploads'
+        const path = 'storage'
         const file = new File([''], 'file1.jpg')
 
         const result = CustomPathFile(path, file)

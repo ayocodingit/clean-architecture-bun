@@ -52,14 +52,35 @@ curl -X PATCH http://localhost:3000/v1/categories/1 \
 
 ---
 
-### 3. High-Performance Storage
+### 3. File upload (contoh kode, bukan route aktif)
 
-**Upload File:**
+Endpoint `/v1/storage` **tidak** terdaftar di app. Untuk upload file:
+
+1. Salin logika dari [`file-upload.example.ts`](./file-upload.example.ts) (`saveUploadedFile`) ke use case module kamu.
+2. Di handler Elysia, terima `multipart/form-data` dan pass `File` ke use case.
+
+**Contoh handler (setelah kamu buat module + route mis. `POST /v1/files`):**
+
+```typescript
+// body: multipart — field file + optional description, category
+public Upload = async (ctx: Context) => {
+    const body = ctx.body as { file: File; description?: string; category?: string }
+    const { file, description, category } = body
+    const result = await this.usecase.Save(file, { description, category })
+    ctx.set.status = 201
+    return { data: result, message: 'UPLOADED' }
+}
+```
+
+**Contoh `curl` (sesuaikan path route yang kamu daftarkan):**
 
 ```bash
-curl -X POST http://localhost:3000/v1/storage \
-  -F "file=@/path/to/image.png"
+curl -X POST http://localhost:3000/v1/files \
+  -F "file=@/path/to/image.png" \
+  -F "description=optional"
 ```
+
+File tersimpan di folder `storage/` (di `.gitignore`); pastikan `mkdir` recursive seperti di contoh.
 
 ---
 
