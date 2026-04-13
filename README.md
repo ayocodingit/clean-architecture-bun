@@ -15,6 +15,7 @@ Boilerplate berbasis **Clean Architecture** untuk runtime **Bun**, dengan lapisa
 - [Kenapa pakai boilerplate ini?](#-kenapa-pakai-boilerplate-ini)
 - [Tech stack](#-tech-stack)
 - [Struktur folder](#-struktur-folder)
+- [Peta layer (target per folder)](#-peta-layer-target-per-folder)
 - [Installasi & setup](#-installasi--setup)
 - [Scripts & perintah](#-scripts--perintah)
 - [Generate code (scaffolding)](#-generate-code-scaffolding)
@@ -55,7 +56,7 @@ src/
 ├── config/                     # Konfigurasi app + validasi env
 ├── cron/                       # Job terjadwal (cron)
 ├── database/
-│   ├── repository/             # Layer akses data per entity (repository.ts + types.ts)
+│   ├── repository/             # Akses data per entity: repository.ts, types.ts, contract.ts (enum / kontrak nilai)
 │   │   └── category/
 │   └── sequelize/              # Koneksi Sequelize, model, relasi, migrasi
 │       ├── models/
@@ -74,7 +75,59 @@ src/
 └── examples/                   # Contoh penggunaan
 ```
 
-Lapisan Clean Architecture: **Entity → Use Case → Interface Adapters (Handler, Repository) → Frameworks (HTTP, Sequelize)**. Dependency mengalir ke dalam (inner tidak kenal outer).
+---
+
+## 🧭 Peta layer (target per folder)
+
+Bagian ini untuk **cepat orientasi** (termasuk kalau kerja ala “vibe code”): kamu cukup tahu **file yang kamu sentuh itu “masuk layer mana”** dan **boleh ngapain / jangan ngapain**. Template Plop tidak perlu diubah; yang perlu konsisten adalah **arah dependency** (lihat diagram di bawah).
+
+### Aturan emas (satu kalimat)
+
+**Request masuk dari HTTP → Handler → Use case → Repository → DB.**  
+Jangan balik arah (misalnya repository tidak boleh import handler atau Elysia).
+
+### Tabel: folder → layer → tugas
+
+| Layer (istilah umum) | Lokasi di repo ini | Target / tugas | Hindari |
+|----------------------|-------------------|----------------|---------|
+| **Frameworks & drivers** | `transport/`, `config/`, `database/sequelize/`, `external/`, `app.ts` | Wiring server (Elysia), plugin global, koneksi DB, env, Redis, entry app | Taruh aturan bisnis di sini |
+| **Interface adapters (masuk)** | `modules/<x>/delivery/http/` | Terjemahin HTTP (query, body, params) → panggil use case; format response | Query DB langsung, logic bisnis berat |
+| **Application (use cases)** | `modules/<x>/usecase/` | Orkestrasi bisnis satu fitur: panggil repo(s), validasi aturan domain | Import `elysia`, `Context`, atau raw SQL di sini |
+| **Domain (entity)** | `modules/<x>/entity/` | Bentuk data + schema validasi request (Joi) untuk fitur itu | Akses DB atau HTTP |
+| **Interface adapters (keluar)** | `database/repository/<entity>/` | CRUD/query Sequelize; `types.ts` + **`contract.ts`** (enum / kontrak nilai per entity) | Import module `modules/...` |
+| **Shared kernel** | `helpers/`, `pkg/` | Util murni (parse query, error, logger, JWT) yang dipakai banyak layer | Jadi “tempat” fitur bisnis baru |
+
+### Cheat sheet: “mau nambah fitur, edit mana?”
+
+1. **Kolom/tabel baru** → `make:model` → `database/sequelize` + `database/repository`.
+2. **Endpoint + alur bisnis** → `make:module` → `modules/<nama>/` (entity → usecase → handler).
+3. **Daftarkan module** → `src/app.ts` (generator biasanya sudah menyisipkan).
+4. **Global HTTP (CORS, error shape, `/docs`)** → `transport/http/http.ts` saja.
+
+### Diagram dependency (arah panah = “boleh bergantung pada”)
+
+```mermaid
+flowchart LR
+  subgraph outer ["Framework dan infra"]
+    T[transport/http]
+    C[config]
+    SEQ[database/sequelize]
+    EXT[external]
+  end
+  subgraph module ["modules / fitur"]
+    H[delivery/http handler]
+    U[usecase]
+    E[entity]
+  end
+  REP[database/repository]
+  H --> U
+  U --> REP
+  U --> E
+  REP --> SEQ
+  T --> H
+```
+
+Ringkasnya: **pusat ada di use case**; HTTP dan DB hanya adapter. Dependency mengalir ke dalam: entity dan use case tidak boleh bergantung pada Elysia atau detail HTTP.
 
 ---
 
@@ -106,8 +159,10 @@ bun run migrate
 | `bun run make:module` | Generate module (usecase + handler + entity) |
 | `bun run make:migration` | Generate file migrasi kosong |
 | `bun run make:cron` | Generate file cron kosong |
-| `bun run seed:run --name=<nama>` | Jalankan seed (nama file tanpa ekstensi) |
-| `bun run cron:run --name=<nama>` | Jalankan satu cron (nama file tanpa ekstensi) |
+| `bun run seed:run -- --name=<nama>` | Jalankan seed (`src/database/seeds/<nama>.seed.ts`) |
+| `SEED_NAME=<nama> bun run seed:run` | Alternatif tanpa argumen CLI (berguna di CI / script) |
+| `bun run cron:run -- --name=<nama>` | Jalankan cron (`src/cron/<nama>.cron.ts`) |
+| `CRON_NAME=<nama> bun run cron:run` | Alternatif tanpa argumen CLI |
 | `bun test` / `bun run test:unit` | Jalankan test (helpers) |
 | `bun run lint` | Cek format (Prettier) |
 | `bun run lint:fix` | Perbaiki format otomatis |
@@ -126,6 +181,7 @@ Menambah **satu entity** di sisi persistence:
 - **Model Sequelize** – `src/database/sequelize/models/<repository>.ts`
 - **Repository** – `src/database/repository/<repository>/repository.ts` (class `XxxRepository`)
 - **Types repository** – `src/database/repository/<repository>/types.ts` (`CreateXxxInput`, `UpdateXxxInput`, `XxxFilter`)
+- **Contract (enum / nilai tetap)** – `src/database/repository/<repository>/contract.ts` (starter dari generator; sesuaikan dengan kolom DB)
 
 Model dan repository otomatis didaftar di `src/database/sequelize/interface.ts` dan `sequelize.ts`.
 

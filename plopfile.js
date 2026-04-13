@@ -152,6 +152,11 @@ module.exports = function (plop) {
             },
             {
                 type: 'add',
+                path: 'src/database/repository/{{camelCase repository}}/contract.ts',
+                templateFile: 'plop-templates/repository/contract.ts.hbs',
+            },
+            {
+                type: 'add',
                 path: 'src/database/sequelize/models/{{kebabCase repository}}.ts',
                 templateFile: 'plop-templates/model/model.ts.hbs',
             },

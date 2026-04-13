@@ -1,0 +1,17 @@
+/**
+ * Status / nilai tetap bisnis untuk entity **{{repository}}**.
+ * Sesuaikan key & string value dengan kolom DB + migrasi; hapus yang tidak dipakai.
+ */
+import type { ValuesOf } from '../../../helpers/valuesOf'
+
+export const {{pascalCase repository}}Lifecycle = {
+    DRAFT: 'draft',
+    PUBLISHED: 'published',
+} as const
+
+export type {{pascalCase repository}}LifecycleValue = ValuesOf<
+    typeof {{pascalCase repository}}Lifecycle
+>
+
+export const {{pascalCase repository}}LifecycleValues: {{pascalCase repository}}LifecycleValue[] =
+    Object.values({{pascalCase repository}}Lifecycle)
